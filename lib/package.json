@@ -1,0 +1,42 @@
+{
+  "name": "CbrDraggable",
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "version": "1.0.0",
+  "main": "./dist/CbrDraggable.umd.cjs",
+  "module": "./dist/CbrDraggable.esm-bundler.js",
+  "export": {
+    ".": {
+      "import": "./dist/CbrDraggable.esm-bundler.js",
+      "require": "./dist/CbrDraggable.umd.cjs"
+    }
+  },
+  "scripts": {
+    "build": "vite build",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "peerDependencies": {
+    "rxjs": "^7.8.1",
+    "vue": "^3.5.13"
+  },
+  "devDependencies": {
+    "@types/jsdom": "^21.1.7",
+    "@tsconfig/node18": "^18.2.4",
+    "@types/node": "^22.9.0",
+    "@vitejs/plugin-vue": "^5.2.0",
+    "@vitejs/plugin-vue-jsx": "^4.1.0",
+    "@vue/tsconfig": "^0.6.0",
+    "path": "^0.12.7",
+    "typescript": "^5.6.3",
+    "vite": "^5.4.11",
+    "vite-tsconfig-paths": "^5.1.2",
+    "vitest": "^2.1.5",
+    "vue-tsc": "^2.1.10"
+  }
+}
