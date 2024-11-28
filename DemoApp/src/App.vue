@@ -2,8 +2,9 @@
 </script>
 
 <template>
-
-  <RouterView />
+  <div class="ma-4">
+    <RouterView />
+  </div>
 </template>
 
 <style scoped>
