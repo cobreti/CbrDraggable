@@ -4,14 +4,21 @@ import vue from '@vitejs/plugin-vue'
 import vueJsx from '@vitejs/plugin-vue-jsx'
 import sassDts from 'vite-plugin-sass-dts'
 import tsconfigPaths from 'vite-tsconfig-paths';
+import dts from 'vite-plugin-dts';
 
 export default defineConfig({
     plugins: [
         vue(),
         sassDts(),
         vueJsx(),
-        tsconfigPaths()
+        tsconfigPaths(),
+        dts()
     ],
+    resolve: {
+        alias: {
+          "@/": new URL("./src/", import.meta.url).pathname,
+        },
+      },
     optimizeDeps: {
         esbuildOptions: {
             tsconfigRaw: {
@@ -22,10 +29,12 @@ export default defineConfig({
         }
     },
     build: {
+        target: "esnext",
+        emptyOutDir: true,
         lib: {
-            entry: resolve(__dirname, 'src/main.ts'),
+            entry: resolve(__dirname, 'src/index.ts'),
             name: 'CbrDraggable',
-            fileName: 'CbrDraggable'
+            fileName: (format) => `index.${format}.js`,
         },
         rollupOptions: {
             external: ['vue'],

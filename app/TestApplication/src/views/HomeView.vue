@@ -21,7 +21,7 @@
           <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test2')">
             <span>test 2</span>
           </BdgDraggableItem>
-          
+
         </CbrDraggable>
         <CbrDraggable id="test" class="draggable-item" :controller="draggableController">
           <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test')">
@@ -82,7 +82,16 @@
 
 
 <script setup lang="ts">
-  import { computed } from 'vue';
+  import {computed, ref} from 'vue';
+
+  // import { CbrDraggableController } from 'cbrdraggable/cbrDraggableController';
+
+  // const draggableController = ref(new CbrDraggableController({
+  //   pinAreaSelector: '.drop-area',
+  //   freeAreaSelector: '.chip-area',
+  // }));
+
+  // draggableController.value.getDraggable("test");
 
   const currentRow = computed(() => [
     "column 1",

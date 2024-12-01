@@ -4,20 +4,10 @@
   "exclude": ["src/**/__tests__/*"],
   "compilerOptions": {
     "composite": true,
-    "noEmit": true,
+    "emitDeclarationOnly": true,
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"],
-      "@XmlParser/*": ["./src/core/modules/XmlParser/*"],
-      "@models/*": ["./src/core/models/*"],
-      "@services/*": ["./src/core/services/*"],
-      "@components/*": ["./src/components/*"],
-      "@libComponents/*": ["./src/libComponents/*"],
-      "@filters/*": ["./src/core/models/filters/*"],
-      "@views/*": ["./src/views/*"],
     },
     "types": ["reflect-metadata"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
   }
 }

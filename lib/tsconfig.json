@@ -4,17 +4,41 @@
     {
       "path": "./tsconfig.node.json"
     },
-    {
-      "path": "./tsconfig.app.json"
-    },
-    {
-      "path": "./tsconfig.vitest.json"
-    }
   ],
   "compilerOptions": {
+    "target": "esnext",
+    "lib": ["DOM", "DOM.Iterable", "esnext", "ScriptHost"],
+    "skipLibCheck": true,
     "module": "NodeNext",
-    "types": ["reflect-metadata"],
-    "experimentalDecorators": true,
-    "emitDecoratorMetadata": true,
-  }
+
+    /* Bundler mode */
+    "allowImportingTsExtensions": true,
+    "noEmit": true,
+    "jsx": "preserve",
+
+    /* Output */
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "isolatedModules": false,
+    "resolveJsonModule": true,
+
+    /* Linting */
+    "strict": false,
+    "noUnusedLocals": false,
+    "noUnusedParameters": false,
+    "noFallthroughCasesInSwitch": true,
+
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+    "incremental": false,
+    "sourceMap": true,
+    "stripInternal": true
+
+  },
+  "include": ["src"],
+  "exclude": ["node_modules"]
 }

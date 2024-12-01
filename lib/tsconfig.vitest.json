@@ -5,6 +5,7 @@
     "composite": true,
     "lib": [],
     "baseUrl": ".",
-    "types": ["node", "jsdom"]
+    "types": ["node", "jsdom"],
+    "emitDeclarationOnly": true
   }
 }

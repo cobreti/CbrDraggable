@@ -3,15 +3,12 @@
   "include": [
     "vite.config.*",
     "vitest.config.*",
-    "cypress.config.*",
-    "nightwatch.conf.*",
-    "playwright.config.*"
   ],
   "compilerOptions": {
     "composite": true,
-    "noEmit": true,
+    "skipLibCheck": true,
     "module": "ESNext",
-    "moduleResolution": "Bundler",
-    "types": ["node"]
+    "moduleResolution": "Node",
+    "allowSyntheticDefaultImports": true
   }
 }

@@ -32,5 +32,6 @@ export {
     DragnDropEvents,
     type CbrUnpinnedEvent,
     type CbrPinEvent,
-    CbrDraggable };
+    CbrDraggable
+ };
 
