@@ -9,14 +9,6 @@ import App from './App.vue'
 import router from './router'
 import { createVuetify } from 'vuetify';
 import 'vuetify/styles';
-import { CbrDraggableController } from 'cbr-draggable';
-
-const ctrl = new CbrDraggableController({
-    pinAreaSelector: '',
-    freeAreaSelector: ''
-});
-
-ctrl.canPick(new HTMLElement());
 
 const app = createApp(App)
 

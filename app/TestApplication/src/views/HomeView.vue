@@ -17,6 +17,11 @@
       </div>
 
       <div class="chip-area">
+        <CbrDraggable :controller="draggableController" id="test">
+          <div class="draggable-item">
+            test
+          </div>
+        </CbrDraggable>
         <!-- <CbrDraggable id="test2" class="draggable-item" :controller="draggableController">
           <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test2')">
             <span>test 2</span>
@@ -38,9 +43,23 @@
 
 <style scoped>
 
+  .draggable-item {
+    display: inline-block;
+    position: relative;
+    background-color: lightgray;
+    padding: 0.25em;
+    /* margin: 0.5em; */
+    border: 1px solid blue;
+    border-radius: 0.5em;
+    min-width: 3em;
+    text-align: center;
+    cursor: pointer;
+  }
+
   .drop-area {
     display: block;
-    height: 2em;
+    height: 3em;
+    padding: 0.25em;
     border: 1px solid blue;
     margin: 1em;
   }
@@ -48,6 +67,7 @@
   .chip-area {
     display: block;
     margin-top: 3em;
+    padding: 0.25em;
     border: 1px solid blue;
     min-height: 4em;
   }
@@ -83,13 +103,14 @@
 
 <script setup lang="ts">
   import {computed, ref} from 'vue';
+  import { CbrDraggable, CbrDraggableController } from 'cbr-draggable';
 
   // import { CbrDraggableController } from 'cbrdraggable/cbrDraggableController';
 
-  // const draggableController = ref(new CbrDraggableController({
-  //   pinAreaSelector: '.drop-area',
-  //   freeAreaSelector: '.chip-area',
-  // }));
+  const draggableController = ref(new CbrDraggableController({
+    pinAreaSelector: '.drop-area',
+    freeAreaSelector: '.chip-area',
+  }));
 
   // draggableController.value.getDraggable("test");
 
