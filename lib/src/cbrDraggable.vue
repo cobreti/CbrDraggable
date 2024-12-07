@@ -100,6 +100,8 @@
         state: CbrDraggableStateEnum.FREE
       });
 
+      draggedElm.value.style.left  = "";
+      draggedElm.value.style.top  = "";
       draggedElm.value.style.position = orgPosition.value;
     }
 
