@@ -41,6 +41,9 @@
     </div>
 </template>
 
+<style src="cbr-draggable/dist/style.css">
+</style>
+
 <style scoped>
 
   .draggable-item {
