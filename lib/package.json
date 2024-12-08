@@ -9,8 +9,7 @@
   "module": "./dist/index.es.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build:tsup": "tsup",
-    "build:vite": "vue-tsc && vite build",
+    "build": "vue-tsc && vite build",
     "tsc": "vue-tsc --noEmit",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
@@ -30,7 +29,6 @@
     "@vitejs/plugin-vue-jsx": "^4.1.0",
     "@vue/tsconfig": "^0.6.0",
     "path": "^0.12.7",
-    "tsup": "^8.3.5",
     "typescript": "^5.6.3",
     "vite": "^5.4.11",
     "vite-plugin-dts": "^4.3.0",
