@@ -15,7 +15,7 @@ export interface CbrDraggableControllerEventsInterface {
 export interface CbrDraggableControllerInterface extends CbrDraggableControllerEventsInterface {
 
     pinAreaElement: HTMLElement;
-    freeAreaElement: HTMLElement;
+    freeAreaElement: HTMLElement | null;
     freeAreaSelector: string;
 
     getPinAreaFromPoint(x: number, y: number): Element | undefined;
@@ -63,7 +63,7 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
         return this.freeAreaSelector_;
     }
 
-    get freeAreaElement(): HTMLElement {
+    get freeAreaElement(): HTMLElement | null {
         return document.querySelector(this.freeAreaSelector_) as HTMLElement;
     }
 
@@ -78,7 +78,7 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
         elements = document.elementsFromPoint(x, y);
 
         dropArea = elements.find((element) => {
-        return element.matches(this.pinAreaSelector_)
+            return element.matches(this.pinAreaSelector_)
         })
     
         return dropArea;

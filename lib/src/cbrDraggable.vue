@@ -51,7 +51,7 @@
   import type { CbrDraggableInterface } from './cbrDraggableInterface';
 
   const draggedElm: Ref<HTMLElement | null> = ref(null)
-  const freeArea : Ref<Element | undefined> = ref();
+  const freeArea : Ref<Element | null> = ref(null);
   const draggableRef: ShallowRef<HTMLElement | null | undefined> = useTemplateRef('draggableContent');
   const orgPosition: Ref<string> = ref('');
   const state: Ref<CbrDraggableState> = ref({
