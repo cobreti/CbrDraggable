@@ -150,8 +150,6 @@
     draggedElm.value = draggableRef.value as HTMLElement;
     orgPosition.value = draggedElm.value.style.position;
 
-    props.controller?.registerDraggable(draggableObject);
-
     if (props.stateChanged) {
       props.stateChanged(state.value);
     }

@@ -3,7 +3,7 @@ import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDra
 import { JSDOM } from 'jsdom';
 import { CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
-import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent } from '@/cbrDragNDropTypes.ts';
+import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
 
 describe('CbrDraggableController', () => {
 
@@ -364,6 +364,78 @@ describe('CbrDraggableController', () => {
 
             expect(mock).toHaveBeenCalledTimes(1);
             expect(paramEvent).toBe(event);
+        });
+    });
+
+    describe('onPin', () => {
+        
+        test('delegate called', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div class="pin-area"></div>
+                    </body>
+                </html>
+            `);
+
+            const draggable = new DraggableObject();
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            global.document = jsdom.window.document;
+
+            const controller = new CbrDraggableController(options);
+            const draggableElement = global.document.createElement('div');
+            draggableElement.classList.add('draggable-object');
+
+            const event : CbrPinEvent = {
+                draggableElement,
+                pinArea: global.document.querySelector(pinAreaSelector) as HTMLElement
+            };
+
+            controller.onPin(draggable, event);
+
+            expect(event.pinArea.querySelector('.draggable-object')).not.toBeNull();
+        });
+    });
+
+    describe('onUnpin', () => {
+
+        test('delegate called', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div class="pin-area">
+                            <div class="draggable-object"></div>
+                        </div>
+                    </body>
+                </html>
+            `);
+
+            const draggable = new DraggableObject();
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            global.document = jsdom.window.document;
+
+            const controller = new CbrDraggableController(options);
+            const pinArea = global.document.querySelector(pinAreaSelector) as HTMLElement;
+            const draggableElement = pinArea.querySelector('.draggable-object') as HTMLElement;
+
+            const event : CbrUnpinnedEvent = {
+                element: draggableElement,
+                pinArea
+            };
+
+            controller.onUnpin(draggable, event);
+
+            expect(event.pinArea.querySelector('.draggable-object')).toBeNull();
         });
     });
 });

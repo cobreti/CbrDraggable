@@ -12,7 +12,7 @@ export type CbrHoverExitEvent = {
 
 export type CbrUnpinnedEvent = {
   element: Element,
-  pinArea: Element
+  pinArea: Element | undefined
 };
 
 export type CbrPinEvent = {
