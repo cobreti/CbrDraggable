@@ -1,21 +1,38 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDraggableController.ts';
 import { JSDOM } from 'jsdom';
+import { CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
+import { ref, Ref } from 'vue';
+import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent } from '@/cbrDragNDropTypes.ts';
 
 describe('CbrDraggableController', () => {
+
+    const pinAreaSelector = '.pin-area';
+    const freeAreaSelector = '.free-area';
+    const draggableObjectId = 'draggable-object-id';
+
+    class DraggableObject implements CbrDraggableInterface {
+        showAddIcon_: Ref<boolean> = ref(true);
+        showRemoveIcon_: Ref<boolean> = ref(true);
+
+        get id() { return draggableObjectId; }
+        get showAddIcon(): Ref<boolean> { return this.showAddIcon_; }
+        get showRemoveIcon(): Ref<boolean> { return this.showRemoveIcon_; }
+
+        unpin(): void {}
+        pin(pinArea: HTMLElement): void {}
+    }
+
+    let jsdom : JSDOM;
+
+    afterEach( () => {
+        vi.clearAllMocks();
+        vi.resetAllMocks();
+        vi.resetModules();
+        vi.restoreAllMocks();
+    });
+
     describe('construction', () => {
-
-        const pinAreaSelector = '.pin-area';
-        const freeAreaSelector = '.free-area';
-
-        let jsdom : JSDOM;
-
-        afterEach( () => {
-            vi.clearAllMocks();
-            vi.resetAllMocks();
-            vi.resetModules();
-            vi.restoreAllMocks();
-        });
 
         test('keeping options', () => {
 
@@ -30,22 +47,11 @@ describe('CbrDraggableController', () => {
             expect(controller.freeAreaSelector_).toEqual(freeAreaSelector);
             expect(controller.pinAreaSelector_).toEqual(pinAreaSelector);
             expect(controller.freeAreaSelector).toEqual(freeAreaSelector);
+            expect(controller.pinAreaSelector).toEqual(pinAreaSelector);
         });
     });
 
     describe('freeAreaElement', () => {
-
-        const pinAreaSelector = '.pin-area';
-        const freeAreaSelector = '.free-area';
-
-        let jsdom : JSDOM;
-
-        afterEach( () => {
-            vi.clearAllMocks();
-            vi.resetAllMocks();
-            vi.resetModules();
-            vi.restoreAllMocks();
-        });
 
         test('freeAreaElement success', () => {
 
@@ -92,13 +98,58 @@ describe('CbrDraggableController', () => {
         })
     });
 
+    describe('pinAreaElement', () => {
+
+        test('pinAreaElement success', () => {
+
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div class="pin-area"></div>
+                    </body>
+                </html>
+            `);
+
+            global.document = jsdom.window.document;
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            expect(controller.pinAreaElement).not.toBeNull();
+            expect(controller.pinAreaElement.className).toEqual('pin-area');
+        });
+
+        test('pinAreaElement failure', () => {            
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div class="pin-area"></div>
+                    </body>
+                </html>
+            `);
+
+            global.document = jsdom.window.document;
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: '.no-pin-area',
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            expect(controller.pinAreaElement).toBeNull();
+        })
+
+    });
+
     describe('getPinAreaFromPoint', () => {
 
         test('getPinAreaFromPoint success', () => {
                 
-            const pinAreaSelector = '.pin-area';
-            const freeAreaSelector = '.free-area';
-
             const options: CbrDraggableControllerOptions = {
                 pinAreaSelector: pinAreaSelector,
                 freeAreaSelector: freeAreaSelector
@@ -133,9 +184,6 @@ describe('CbrDraggableController', () => {
         });
 
         test('getPinAreaFromPoint failure', () => {                   
-            const pinAreaSelector = '.pin-area';
-            const freeAreaSelector = '.free-area';
-
             const options: CbrDraggableControllerOptions = {
                 pinAreaSelector: pinAreaSelector,
                 freeAreaSelector: freeAreaSelector
@@ -163,11 +211,10 @@ describe('CbrDraggableController', () => {
         });
 
         test('getPinAreaFromPoint no pinAreaSelector', () => {
-            const pinAreaSelector = '';
-            const freeAreaSelector = '.free-area';
+            const emptyPinAreaSelector = '';
 
             const options: CbrDraggableControllerOptions = {
-                pinAreaSelector: pinAreaSelector,
+                pinAreaSelector: emptyPinAreaSelector,
                 freeAreaSelector: freeAreaSelector
             };
 
@@ -190,6 +237,133 @@ describe('CbrDraggableController', () => {
             const element = controller.getPinAreaFromPoint(x, y);
 
             expect(element).toBeUndefined();
+        });
+    });
+
+    describe('canPick', () => {
+
+        test('canPick pick disabled', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div cbr-dragndrop-no-pick></div>
+                    </body>
+                </html>
+            `);
+
+            global.document = jsdom.window.document;
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            const canPick = controller.canPick(jsdom.window.document.querySelector('div'));
+
+            expect(canPick).toBeFalsy();
+        });
+
+        test('canPick pick enabled', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div></div>
+                    </body>
+                </html>
+            `);
+
+            global.document = jsdom.window.document;
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            const canPick = controller.canPick(jsdom.window.document.querySelector('div'));
+
+            expect(canPick).toBeTruthy();
+        });
+
+    });
+
+    describe('onHoverEnter', () => {
+
+        test('delegate called', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div></div>
+                    </body>
+                </html>
+            `);
+
+            const draggable = new DraggableObject();
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            global.document = jsdom.window.document;
+
+            const controller = new CbrDraggableController(options);
+
+            const event : CbrHoverEnterEvent= {
+                element: global.document.createElement('div'),
+                dropPrevented: false,
+                preventDrop: () => {}
+            };
+
+            // function delegate(event: CbrHoverEnterEvent) {
+            // }
+
+            let paramEvent : CbrHoverEnterEvent | undefined = undefined;
+            const mock = vi.fn<CbrHoverEnterDelegate>().mockImplementation(event => { paramEvent = event; });
+
+            controller.onHoverEnter(draggable, event, mock);
+
+            expect(mock).toHaveBeenCalledTimes(1);
+            expect(paramEvent).toBe(event);
+        });
+    });
+
+    describe('onHoverExit', () => {
+        
+        test('delegate called', () => {
+            jsdom = new JSDOM(`
+                <html>
+                    <body>
+                        <div></div>
+                    </body>
+                </html>
+            `);
+
+            const draggable = new DraggableObject();
+
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            global.document = jsdom.window.document;
+
+            const controller = new CbrDraggableController(options);
+
+            const event : CbrHoverExitEvent = {
+                element: global.document.createElement('div')
+            };
+
+            let paramEvent = undefined;
+            const mock = vi.fn<CbrHoverExitDelegate>().mockImplementation(event => { paramEvent = event; });
+
+            controller.onHoverExit(draggable, event, mock);
+
+            expect(mock).toHaveBeenCalledTimes(1);
+            expect(paramEvent).toBe(event);
         });
     });
 });

@@ -59,6 +59,10 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
         return document.querySelector(this.pinAreaSelector_) as HTMLElement;
     }
 
+    get pinAreaSelector(): string {
+        return this.pinAreaSelector_;
+    }
+
     get freeAreaSelector(): string {
         return this.freeAreaSelector_;
     }
