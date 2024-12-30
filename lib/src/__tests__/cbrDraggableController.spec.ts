@@ -3,7 +3,7 @@ import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDra
 import { JSDOM } from 'jsdom';
 import { CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
-import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
+// import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
 
 describe('CbrDraggableController', () => {
 
@@ -290,152 +290,65 @@ describe('CbrDraggableController', () => {
 
     });
 
-    describe('onHoverEnter', () => {
-
-        test('delegate called', () => {
+    describe('addToFreeArea', () => {
+        test('addToFreeArea success', () => {
             jsdom = new JSDOM(`
                 <html>
                     <body>
-                        <div></div>
                     </body>
                 </html>
             `);
 
-            const draggable = new DraggableObject();
+            global.document = jsdom.window.document;
 
             const options: CbrDraggableControllerOptions = {
                 pinAreaSelector: pinAreaSelector,
                 freeAreaSelector: freeAreaSelector
             };
 
-            global.document = jsdom.window.document;
+            const freeAreaElm = jsdom.window.document.createElement('div');
+            const elm = jsdom.window.document.createElement('div');
 
             const controller = new CbrDraggableController(options);
 
-            const event : CbrHoverEnterEvent= {
-                element: global.document.createElement('div'),
-                dropPrevented: false,
-                preventDrop: () => {}
-            };
+            const resetElementPositionSpy = vi.spyOn(controller, 'resetElementPosition').mockImplementation(() => {});
 
-            // function delegate(event: CbrHoverEnterEvent) {
-            // }
+            controller.addToFreeArea(elm, freeAreaElm);
 
-            let paramEvent : CbrHoverEnterEvent | undefined = undefined;
-            const mock = vi.fn<CbrHoverEnterDelegate>().mockImplementation(event => { paramEvent = event; });
-
-            controller.onHoverEnter(draggable, event, mock);
-
-            expect(mock).toHaveBeenCalledTimes(1);
-            expect(paramEvent).toBe(event);
+            expect(freeAreaElm.children.length).toEqual(1);
+            expect(resetElementPositionSpy).toHaveBeenCalledTimes(1);
         });
     });
 
-    describe('onHoverExit', () => {
-        
-        test('delegate called', () => {
+    describe('resetElementPosition', () => {
+        test('resetElementPosition success', () => {
             jsdom = new JSDOM(`
                 <html>
                     <body>
-                        <div></div>
                     </body>
                 </html>
             `);
 
-            const draggable = new DraggableObject();
+            global.document = jsdom.window.document;
 
             const options: CbrDraggableControllerOptions = {
                 pinAreaSelector: pinAreaSelector,
                 freeAreaSelector: freeAreaSelector
             };
 
-            global.document = jsdom.window.document;
+            const elm = jsdom.window.document.createElement('div');
+
+            elm.style.left = '10px';
+            elm.style.top = '10px';
+            elm.style.position = 'fixed';
 
             const controller = new CbrDraggableController(options);
 
-            const event : CbrHoverExitEvent = {
-                element: global.document.createElement('div')
-            };
+            controller.resetElementPosition(elm);
 
-            let paramEvent = undefined;
-            const mock = vi.fn<CbrHoverExitDelegate>().mockImplementation(event => { paramEvent = event; });
-
-            controller.onHoverExit(draggable, event, mock);
-
-            expect(mock).toHaveBeenCalledTimes(1);
-            expect(paramEvent).toBe(event);
-        });
-    });
-
-    describe('onPin', () => {
-        
-        test('delegate called', () => {
-            jsdom = new JSDOM(`
-                <html>
-                    <body>
-                        <div class="pin-area"></div>
-                    </body>
-                </html>
-            `);
-
-            const draggable = new DraggableObject();
-
-            const options: CbrDraggableControllerOptions = {
-                pinAreaSelector: pinAreaSelector,
-                freeAreaSelector: freeAreaSelector
-            };
-
-            global.document = jsdom.window.document;
-
-            const controller = new CbrDraggableController(options);
-            const draggableElement = global.document.createElement('div');
-            draggableElement.classList.add('draggable-object');
-
-            const event : CbrPinEvent = {
-                draggableElement,
-                pinArea: global.document.querySelector(pinAreaSelector) as HTMLElement
-            };
-
-            controller.onPin(draggable, event);
-
-            expect(event.pinArea.querySelector('.draggable-object')).not.toBeNull();
-        });
-    });
-
-    describe('onUnpin', () => {
-
-        test('delegate called', () => {
-            jsdom = new JSDOM(`
-                <html>
-                    <body>
-                        <div class="pin-area">
-                            <div class="draggable-object"></div>
-                        </div>
-                    </body>
-                </html>
-            `);
-
-            const draggable = new DraggableObject();
-
-            const options: CbrDraggableControllerOptions = {
-                pinAreaSelector: pinAreaSelector,
-                freeAreaSelector: freeAreaSelector
-            };
-
-            global.document = jsdom.window.document;
-
-            const controller = new CbrDraggableController(options);
-            const pinArea = global.document.querySelector(pinAreaSelector) as HTMLElement;
-            const draggableElement = pinArea.querySelector('.draggable-object') as HTMLElement;
-
-            const event : CbrUnpinnedEvent = {
-                element: draggableElement,
-                pinArea
-            };
-
-            controller.onUnpin(draggable, event);
-
-            expect(event.pinArea.querySelector('.draggable-object')).toBeNull();
+            expect(elm.style.left).toEqual('');
+            expect(elm.style.top).toEqual('');
+            expect(elm.style.position).toEqual('');
         });
     });
 });
