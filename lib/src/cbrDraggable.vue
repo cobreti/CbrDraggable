@@ -42,12 +42,11 @@
     type CbrDraggableState,
     CbrDraggableStateEnum,
     type CbrHoverEnterEvent,
-    type CbrHoverEnterDelegate,
     type CbrHoverExitEvent,
     type CbrPinEvent,
     type CbrUnpinnedEvent
   } from './cbrDragNDropTypes'
-  import type { CbrDraggableControllerInterface } from './cbrDraggableController';
+  import type { CbrDraggableControllerInterface, CbrDraggableEventsInterface } from './cbrDraggableController';
   import type { CbrDraggableInterface } from './cbrDraggableInterface';
 
   const draggedElm: Ref<HTMLElement | null> = ref(null)
@@ -68,13 +67,13 @@
 
   const props = defineProps<{
     id: string,
-    controller?: CbrDraggableControllerInterface,
-    hoverEnter?: CbrHoverEnterDelegate,
-    hoverExit?: (event: CbrHoverExitEvent) => void,
-    stateChanged?: (state: CbrDraggableState) => void
+    controller: CbrDraggableControllerInterface,
+    eventListener?: CbrDraggableEventsInterface
   }>()
 
-
+  //
+  //  DraggableObject
+  //
   class DraggableObject implements CbrDraggableInterface {
     get id(): string { return props.id}
 
@@ -92,7 +91,7 @@
           pinArea: state.value.pinArea!
         }
 
-        props.controller?.onUnpin(this, unpinEvent);
+        props.eventListener?.onUnpin(this, unpinEvent);
       }
 
       addToFreeArea();
@@ -116,7 +115,7 @@
           pinArea: state.value.pinArea!
         }
 
-        props.controller?.onUnpin(draggableObject, unpinEvent);
+        props.eventListener?.onUnpin(draggableObject, unpinEvent);
       }
 
       const pinEvent: CbrPinEvent = {
@@ -124,7 +123,9 @@
         pinArea
       };
 
-      props.controller?.onPin(this, pinEvent);
+      props.eventListener?.onPin(this, pinEvent);
+
+      pinArea.appendChild(draggedElm.value);
 
       draggedElm.value.style.left  = "";
       draggedElm.value.style.top  = "";
@@ -146,13 +147,11 @@
   onMounted(() => {
     console.log('CbrDraggable mounted');
 
-    freeArea.value = props.controller?.freeAreaElement;
+    freeArea.value = props.controller.freeAreaElement;
     draggedElm.value = draggableRef.value as HTMLElement;
     orgPosition.value = draggedElm.value.style.position;
 
-    if (props.stateChanged) {
-      props.stateChanged(state.value);
-    }
+    props.eventListener?.onStateChanged(state.value);
   });
 
   /**
@@ -161,9 +160,7 @@
    */
   function setState(newState: CbrDraggableState) {
     state.value = newState;
-    if (props.stateChanged) {
-      props.stateChanged(state.value);
-    }
+    props.eventListener?.onStateChanged(state.value);
   }
 
   /**
@@ -196,14 +193,6 @@
     });
   }
 
-  function createNext<T>(delegate?: (value: T) => void): (nextValue: T) => void {
-    return (value: T) => {
-      if (delegate) {
-        delegate(value);
-      }
-    }
-  }
-
   /**
    * on drag move event handler
    *  called by mouse move or touch move event
@@ -232,7 +221,7 @@
           }
         };
 
-        props.controller?.onHoverEnter(draggableObject, hoverEnterEvent, createNext(props.hoverEnter));
+        props.eventListener?.onHoverEnter(draggableObject, hoverEnterEvent);
 
         if (hoverEnterEvent.dropPrevented) {
           console.log('drop prevented');
@@ -245,7 +234,7 @@
           dropArea: state.value.hoverArea
         };
 
-        props.controller?.onHoverExit(draggableObject, hoverExitEvent, createNext(props.hoverExit));
+        props.eventListener?.onHoverExit(draggableObject, hoverExitEvent);
       }
 
       setState({
@@ -269,7 +258,8 @@
       draggableObject.pin(state.value.hoverArea as HTMLElement);
     }
     else {
-      draggableObject.unpin();
+      console.log('draggable not over a drop area');
+      props.controller?.resetElementPosition(draggedElm.value);
     }
 
     draggedElm.value.style.position = orgPosition.value;

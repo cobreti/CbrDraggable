@@ -1,5 +1,5 @@
 import {
-    type CbrDraggableControllerEventsInterface,
+    type CbrDraggableEventsInterface,
     type CbrDraggableControllerInterface,
     CbrDraggableController } from './cbrDraggableController.ts';
 
@@ -21,7 +21,7 @@ import
     CbrDraggable from './cbrDraggable.vue';
 
 export {
-    type CbrDraggableControllerEventsInterface,
+    type CbrDraggableEventsInterface,
     type CbrDraggableControllerInterface,
     CbrDraggableController,
     type CbrDraggableInterface,

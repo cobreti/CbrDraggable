@@ -1,17 +1,18 @@
 import type { CbrDraggableInterface } from "./cbrDraggableInterface.ts";
-import type { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from "./cbrDragNDropTypes.ts";
+import type { CbrDraggableState, CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from "./cbrDragNDropTypes.ts";
 
 
-export interface CbrDraggableControllerEventsInterface {
+export interface CbrDraggableEventsInterface {
 
-    onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent, delegate: CbrHoverEnterDelegate): void;
-    onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent, delegate: CbrHoverExitDelegate): void
+    onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void;
+    onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void
     onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void;
     onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void;
+    onStateChanged(state: CbrDraggableState): void;
 }
 
 
-export interface CbrDraggableControllerInterface extends CbrDraggableControllerEventsInterface {
+export interface CbrDraggableControllerInterface {
 
     pinAreaElement: HTMLElement;
     freeAreaElement: HTMLElement | null;
@@ -28,6 +29,8 @@ export interface CbrDraggableControllerInterface extends CbrDraggableControllerE
     canPick(elm: HTMLElement): boolean;
 
     addToFreeArea(elm: HTMLElement, freeArea: HTMLElement): void;
+
+    resetElementPosition(elm: HTMLElement): void;
 }
 
 
@@ -86,37 +89,12 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
 
     addToFreeArea(elm: HTMLElement, freeArea: HTMLElement): void {
         freeArea.appendChild(elm);
+        this.resetElementPosition(elm);
+    }
+
+    resetElementPosition(elm: HTMLElement): void {
         elm.style.left  = "";
         elm.style.top  = "";
-        elm.style.position = '';  
+        elm.style.position = '';
     }
-
-    //
-    // events
-    //
-
-    onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent, delegate: CbrHoverEnterDelegate): void {
-        console.log('onHoverEnter', event);
-
-        delegate(event);
-    }
-    
-    onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent, delegate: CbrHoverExitDelegate): void {
-        console.log('onHoverExit', event);
-
-        delegate(event);
-    }
-
-    onPin(draggable: CbrDraggableInterface, event: CbrPinEvent) {
-        console.log('onPin', event);
-
-        event.pinArea.appendChild(event.draggableElement);
-    }
-
-    onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
-        console.log('onUnpin', event);
-
-        event.pinArea?.removeChild(event.element);
-    }
-
 }

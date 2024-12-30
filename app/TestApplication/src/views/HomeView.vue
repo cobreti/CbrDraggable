@@ -16,7 +16,7 @@
             </div>
       </div>
 
-      <div class="chip-area">
+      <div class="chip-area drop-area">
         <CbrDraggable :controller="draggableController" id="test">
           <div class="draggable-item">
             test
@@ -38,6 +38,10 @@
             <span>test 3</span>
         </CbrDraggable> -->
       </div>
+
+      <log-area class="log-area">
+
+      </log-area>
     </div>
 </template>
 
@@ -101,12 +105,27 @@
     }
   }
 
+  .log-area {
+    display: block;
+    border: 1px solid black;
+    margin-left: 1em;
+    width: 80%;
+    height: 10em;
+  }
+
 </style>
 
 
 <script setup lang="ts">
+  import LogArea from '../components/LogArea.vue';
   import {computed, ref} from 'vue';
   import { CbrDraggable, CbrDraggableController } from 'cbr-draggable';
+  import { useLogStore } from '../stores/logs';
+
+  const logStore = useLogStore();
+
+  logStore.add("test");
+  logStore.add("other");
 
   // import { CbrDraggableController } from 'cbrdraggable/cbrDraggableController';
 
