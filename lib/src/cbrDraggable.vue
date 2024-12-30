@@ -118,6 +118,7 @@
         props.eventListener?.onUnpin(draggableObject, unpinEvent);
       }
 
+
       const pinEvent: CbrPinEvent = {
         draggableElement: draggedElm.value,
         pinArea
@@ -131,10 +132,16 @@
       draggedElm.value.style.top  = "";
       draggedElm.value.style.position = orgPosition.value;
 
-      setState({
-        state: CbrDraggableStateEnum.PINNED,
-        pinArea: pinArea
-      });
+      if (pinArea == props.controller.freeAreaElement) {
+        setState({
+          state: CbrDraggableStateEnum.FREE
+        });
+      } else {
+        setState({
+          state: CbrDraggableStateEnum.PINNED,
+          pinArea: pinArea
+        });
+      }
     }
   };
   
@@ -151,7 +158,9 @@
     draggedElm.value = draggableRef.value as HTMLElement;
     orgPosition.value = draggedElm.value.style.position;
 
-    props.eventListener?.onStateChanged(state.value);
+    props.controller?.registerDraggable(draggableObject);
+
+    props.eventListener?.onStateChanged(draggableObject, state.value);
   });
 
   /**
@@ -160,7 +169,7 @@
    */
   function setState(newState: CbrDraggableState) {
     state.value = newState;
-    props.eventListener?.onStateChanged(state.value);
+    props.eventListener?.onStateChanged(draggableObject, state.value);
   }
 
   /**
@@ -349,6 +358,17 @@
    * @param event 
    */
   function onMouseDown(event: MouseEvent) {
+    const elm = event.target as HTMLElement;
+
+    if (!elm) {
+      return;
+    }
+
+    const draggableElm = elm.closest('.draggable-item');
+    if (!draggableElm) {
+      return;
+    }
+
     if (!props.controller?.canPick(event.target as HTMLElement)) {
       return;
     }
@@ -366,6 +386,21 @@
    * @param event 
    */
   function onTouchStart(event: TouchEvent) {
+    const elm = event.target as HTMLElement;
+
+    if (!elm) {
+      return;
+    }
+
+    const draggableElm = elm.closest('.draggable-item');
+    if (!draggableElm) {
+      return;
+    }
+
+    if (!props.controller?.canPick(event.target as HTMLElement)) {
+      return;
+    }
+
     event.preventDefault();
 
     onDragStart();

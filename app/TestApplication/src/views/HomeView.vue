@@ -17,7 +17,7 @@
       </div>
 
       <div class="chip-area drop-area">
-        <CbrDraggable :controller="draggableController" id="test">
+        <CbrDraggable id="test" :controller="draggableController" :event-listener="draggableEventListener">
           <div class="draggable-item">
             test
           </div>
@@ -119,13 +119,10 @@
 <script setup lang="ts">
   import LogArea from '../components/LogArea.vue';
   import {computed, ref} from 'vue';
-  import { CbrDraggable, CbrDraggableController } from 'cbr-draggable';
+  import { CbrDraggable, CbrDraggableController, type CbrDraggableEventsInterface, type CbrDraggableInterface, type CbrDraggableState, type CbrHoverEnterEvent, type CbrHoverExitEvent, type CbrPinEvent, type CbrUnpinnedEvent } from 'cbr-draggable';
   import { useLogStore } from '../stores/logs';
 
   const logStore = useLogStore();
-
-  logStore.add("test");
-  logStore.add("other");
 
   // import { CbrDraggableController } from 'cbrdraggable/cbrDraggableController';
 
@@ -134,7 +131,25 @@
     freeAreaSelector: '.chip-area',
   }));
 
-  // draggableController.value.getDraggable("test");
+  class DraggableEventListener implements CbrDraggableEventsInterface {
+    onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
+      logStore.add(`onHoverEnter: ${draggable.id}`);
+    }
+    onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void {
+      logStore.add(`onHoverExit: ${draggable.id}`);
+    }
+    onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void {
+      logStore.add(`onPin: ${draggable.id}`);
+    }
+    onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
+      logStore.add(`onUnpin: ${draggable.id}`);
+    }
+    onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void {
+      logStore.add(`${draggable.id} -- onStateChanged: ${state.state}`);
+    }
+  }
+
+  const draggableEventListener = ref(new DraggableEventListener());
 
   const currentRow = computed(() => [
     "column 1",
