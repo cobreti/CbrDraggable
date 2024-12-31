@@ -1,7 +1,7 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
 import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDraggableController.ts';
 import { JSDOM } from 'jsdom';
-import { CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
+import { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
 // import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
 
@@ -12,6 +12,13 @@ describe('CbrDraggableController', () => {
     const draggableObjectId = 'draggable-object-id';
 
     class DraggableObject implements CbrDraggableInterface {
+        addEventListener(eventListener: CbrDraggableEventsListenerInterface) {
+        }
+        removeEventListener(eventListener: CbrDraggableEventsListenerInterface) {
+        }
+        forEachListener(callback: (eventListener: CbrDraggableEventsListenerInterface) => void) {
+        }
+
         showAddIcon_: Ref<boolean> = ref(true);
         showRemoveIcon_: Ref<boolean> = ref(true);
 

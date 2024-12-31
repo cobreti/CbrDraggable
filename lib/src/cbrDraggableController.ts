@@ -1,16 +1,5 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import type { CbrDraggableInterface } from "./cbrDraggableInterface.ts";
-import type { CbrDraggableState, CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from "./cbrDragNDropTypes.ts";
-
-
-export interface CbrDraggableEventsInterface {
-
-    onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void;
-    onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void
-    onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void;
-    onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void;
-    onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void;
-}
 
 
 export interface CbrDraggableControllerInterface {

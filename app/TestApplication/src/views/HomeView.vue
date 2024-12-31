@@ -16,7 +16,7 @@
             </div>
       </div>
 
-      <div class="chip-area drop-area">
+      <div id="chip-area" class="chip-area drop-area">
         <CbrDraggable id="test" :controller="draggableController" :event-listener="draggableEventListener">
           <div class="draggable-item">
             test
@@ -39,9 +39,9 @@
         </CbrDraggable> -->
       </div>
 
-      <log-area class="log-area">
+      <draggable-observer-panel class="draggable-observer-panel" id="test" :controller="draggableController">
 
-      </log-area>
+      </draggable-observer-panel>
     </div>
 </template>
 
@@ -49,6 +49,13 @@
 </style>
 
 <style scoped>
+
+  .draggable-observer-panel {
+    width: 90%;
+    border: 1px solid black;
+    margin-left: 1em;
+  }
+
 
   .draggable-item {
     display: inline-block;
@@ -117,35 +124,30 @@
 
 
 <script setup lang="ts">
-  import LogArea from '../components/LogArea.vue';
+  import DraggableObserverPanel from '../components/DraggableObserverPanel.vue';
   import {computed, ref} from 'vue';
-  import { CbrDraggable, CbrDraggableController, type CbrDraggableEventsInterface, type CbrDraggableInterface, type CbrDraggableState, type CbrHoverEnterEvent, type CbrHoverExitEvent, type CbrPinEvent, type CbrUnpinnedEvent } from 'cbr-draggable';
-  import { useLogStore } from '../stores/logs';
-
-  const logStore = useLogStore();
-
-  // import { CbrDraggableController } from 'cbrdraggable/cbrDraggableController';
+  import { CbrDraggable, CbrDraggableController, type CbrDraggableEventsListenerInterface, type CbrDraggableInterface, type CbrDraggableState, type CbrHoverEnterEvent, type CbrHoverExitEvent, type CbrPinEvent, type CbrUnpinnedEvent } from 'cbr-draggable';
 
   const draggableController = ref(new CbrDraggableController({
     pinAreaSelector: '.drop-area',
     freeAreaSelector: '.chip-area',
   }));
 
-  class DraggableEventListener implements CbrDraggableEventsInterface {
+  class DraggableEventListener implements CbrDraggableEventsListenerInterface {
     onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
-      logStore.add(`onHoverEnter: ${draggable.id}`);
+      console.log(`onHoverEnter: ${draggable.id}`);
     }
     onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void {
-      logStore.add(`onHoverExit: ${draggable.id}`);
+      console.log(`onHoverExit: ${draggable.id}`);
     }
     onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void {
-      logStore.add(`onPin: ${draggable.id}`);
+      console.log(`onPin: ${draggable.id}`);
     }
     onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
-      logStore.add(`onUnpin: ${draggable.id}`);
+      console.log(`onUnpin: ${draggable.id}`);
     }
     onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void {
-      logStore.add(`${draggable.id} -- onStateChanged: ${state.state}`);
+      console.log(`${draggable.id} -- onStateChanged: ${state.state}`);
     }
   }
 

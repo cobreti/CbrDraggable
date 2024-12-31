@@ -46,8 +46,8 @@
     type CbrPinEvent,
     type CbrUnpinnedEvent
   } from './cbrDragNDropTypes'
-  import type { CbrDraggableControllerInterface, CbrDraggableEventsInterface } from './cbrDraggableController';
-  import type { CbrDraggableInterface } from './cbrDraggableInterface';
+  import type { CbrDraggableControllerInterface } from './cbrDraggableController';
+  import type { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from './cbrDraggableInterface';
 
   const draggedElm: Ref<HTMLElement | null> = ref(null)
   const freeArea : Ref<Element | null> = ref(null);
@@ -68,13 +68,18 @@
   const props = defineProps<{
     id: string,
     controller: CbrDraggableControllerInterface,
-    eventListener?: CbrDraggableEventsInterface
+    eventListener?: CbrDraggableEventsListenerInterface
   }>()
+
+  type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
 
   //
   //  DraggableObject
   //
   class DraggableObject implements CbrDraggableInterface {
+
+    eventListeners_: EventListenersInterfacesTable = new Set();
+
     get id(): string { return props.id}
 
     get showAddIcon(): Ref<boolean> { return showAddIcon }
@@ -91,7 +96,11 @@
           pinArea: state.value.pinArea!
         }
 
-        props.eventListener?.onUnpin(this, unpinEvent);
+        draggableObject.forEachListener((eventListener) => {
+          eventListener.onUnpin(this, unpinEvent);
+        });
+
+        // props.eventListener?.onUnpin(this, unpinEvent);
       }
 
       addToFreeArea();
@@ -115,7 +124,10 @@
           pinArea: state.value.pinArea!
         }
 
-        props.eventListener?.onUnpin(draggableObject, unpinEvent);
+        draggableObject.forEachListener((eventListener) => {
+          eventListener.onUnpin(this, unpinEvent);
+        });
+        // props.eventListener?.onUnpin(draggableObject, unpinEvent);
       }
 
 
@@ -124,7 +136,10 @@
         pinArea
       };
 
-      props.eventListener?.onPin(this, pinEvent);
+      draggableObject.forEachListener((eventListener) => {
+        eventListener.onPin(this, pinEvent);
+      });
+      // props.eventListener?.onPin(this, pinEvent);
 
       pinArea.appendChild(draggedElm.value);
 
@@ -143,10 +158,25 @@
         });
       }
     }
+
+    addEventListener(eventListener: CbrDraggableEventsListenerInterface) {
+      this.eventListeners_.add(eventListener);
+    }
+
+    removeEventListener(eventListener: CbrDraggableEventsListenerInterface) {
+      this.eventListeners_.delete(eventListener);
+    }
+
+    forEachListener(callback: (eventListener: CbrDraggableEventsListenerInterface) => void) {
+      this.eventListeners_.forEach(callback);
+    }
   };
   
   const draggableObject : CbrDraggableInterface = new DraggableObject();
 
+  if (props.eventListener) {
+    draggableObject.addEventListener(props.eventListener);
+  }
 
   /**
    * Mounted hook
@@ -160,7 +190,11 @@
 
     props.controller?.registerDraggable(draggableObject);
 
-    props.eventListener?.onStateChanged(draggableObject, state.value);
+    draggableObject.forEachListener((eventListener) => {
+      eventListener.onStateChanged(draggableObject, state.value);
+    });
+
+    // props.eventListener?.onStateChanged(draggableObject, state.value);
   });
 
   /**
@@ -169,7 +203,12 @@
    */
   function setState(newState: CbrDraggableState) {
     state.value = newState;
-    props.eventListener?.onStateChanged(draggableObject, state.value);
+
+    draggableObject.forEachListener((eventListener) => {
+      eventListener.onStateChanged(draggableObject, state.value);
+    });
+
+    // props.eventListener?.onStateChanged(draggableObject, state.value);
   }
 
   /**
@@ -230,7 +269,10 @@
           }
         };
 
-        props.eventListener?.onHoverEnter(draggableObject, hoverEnterEvent);
+        draggableObject.forEachListener((eventListener) => {
+          eventListener.onHoverEnter(draggableObject, hoverEnterEvent);
+        });
+        // props.eventListener?.onHoverEnter(draggableObject, hoverEnterEvent);
 
         if (hoverEnterEvent.dropPrevented) {
           console.log('drop prevented');
@@ -243,7 +285,10 @@
           dropArea: state.value.hoverArea
         };
 
-        props.eventListener?.onHoverExit(draggableObject, hoverExitEvent);
+        draggableObject.forEachListener((eventListener) => {
+          eventListener.onHoverExit(draggableObject, hoverExitEvent);
+        });
+        // props.eventListener?.onHoverExit(draggableObject, hoverExitEvent);
       }
 
       setState({
