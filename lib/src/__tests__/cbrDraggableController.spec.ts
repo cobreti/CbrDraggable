@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDraggableController.ts';
+import { CbrDraggableController, CbrDraggableControllerOptions, DraggableBehaviorSubject } from '../cbrDraggableController.ts';
 import { JSDOM } from 'jsdom';
 import { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
@@ -390,7 +390,7 @@ describe('CbrDraggableController', () => {
             const draggable = new DraggableObject();
 
 
-            const subject = new BehaviorSubject<CbrDraggableInterface | undefined>(undefined);
+            const subject = new DraggableBehaviorSubject(undefined);
             const nextSpy = vi.spyOn(subject, 'next').mockImplementation(() => {});
 
             controller.draggables_[draggableObjectId] = subject;
@@ -398,6 +398,80 @@ describe('CbrDraggableController', () => {
             controller.registerDraggable(draggable);
 
             expect(nextSpy).toHaveBeenCalledTimes(1);
+        });
+    });
+
+    describe('getDraggableObserver', () => {
+
+        test('subject already exists', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+            controller.draggables_[draggableObjectId] = new DraggableBehaviorSubject(undefined);
+
+            const draggable = new DraggableObject();
+
+            const observer = controller.getDraggableObserver(draggableObjectId);
+
+            expect(observer).not.toBeNull();
+        });
+
+        test('subject does not exist', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            const observer = controller.getDraggableObserver(draggableObjectId);
+
+            expect(observer).not.toBeNull();
+        });
+
+    });
+
+    describe('getDraggable', () => {
+
+        test('draggable present', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+            const draggable = new DraggableObject();
+            controller.draggables_[draggableObjectId] = new DraggableBehaviorSubject(draggable);
+
+            const result = controller.getDraggable(draggableObjectId);
+
+            expect(result).not.toBeNull();
+        });
+
+        test('draggable id not present', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            expect(() => controller.getDraggable(draggableObjectId)).toThrowError();
+        });
+
+        test('draggable id present with undefined value', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+            controller.draggables_[draggableObjectId] = new DraggableBehaviorSubject(undefined);
+
+            expect(() => controller.getDraggable(draggableObjectId)).toThrowError();
         });
     });
 });

@@ -33,7 +33,9 @@ export type CbrDraggableControllerOptions = {
     freeAreaSelector: string;
 }
 
-type DraggablesTable = {[key: string]: BehaviorSubject<CbrDraggableInterface | undefined>};
+export class DraggableBehaviorSubject extends BehaviorSubject<CbrDraggableInterface | undefined> {}
+
+type DraggablesTable = {[key: string]: DraggableBehaviorSubject};
 
 export class CbrDraggableController implements CbrDraggableControllerInterface {
 
@@ -100,13 +102,13 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
             this.draggables_[id].next(draggable);
         }
         else {
-            this.draggables_[id] = new BehaviorSubject<CbrDraggableInterface | undefined>(draggable);
+            this.draggables_[id] = new DraggableBehaviorSubject(draggable);
         }
     }
 
     getDraggableObserver(id: string): Observable<CbrDraggableInterface | undefined> {
         if (!(id in this.draggables_)) {
-            this.draggables_[id] = new BehaviorSubject<CbrDraggableInterface | undefined>(undefined);
+            this.draggables_[id] = new DraggableBehaviorSubject(undefined);
         }
 
         return this.draggables_[id];
