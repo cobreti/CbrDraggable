@@ -3,6 +3,7 @@ import { CbrDraggableController, CbrDraggableControllerOptions } from '../cbrDra
 import { JSDOM } from 'jsdom';
 import { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
+import { BehaviorSubject } from 'rxjs';
 // import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
 
 describe('CbrDraggableController', () => {
@@ -356,6 +357,47 @@ describe('CbrDraggableController', () => {
             expect(elm.style.left).toEqual('');
             expect(elm.style.top).toEqual('');
             expect(elm.style.position).toEqual('');
+        });
+    });
+
+    describe('registerDraggable', () => {
+
+        test('subject does not exist', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            const draggable = new DraggableObject();
+
+            controller.registerDraggable(draggable);
+
+            const subject = controller.draggables_[draggableObjectId];
+            expect(subject).not.toBeNull();
+            expect(subject.getValue()).toEqual(draggable);
+        });
+
+        test('subject already exists', () => {
+            const options: CbrDraggableControllerOptions = {
+                pinAreaSelector: pinAreaSelector,
+                freeAreaSelector: freeAreaSelector
+            };
+
+            const controller = new CbrDraggableController(options);
+
+            const draggable = new DraggableObject();
+
+
+            const subject = new BehaviorSubject<CbrDraggableInterface | undefined>(undefined);
+            const nextSpy = vi.spyOn(subject, 'next').mockImplementation(() => {});
+
+            controller.draggables_[draggableObjectId] = subject;
+
+            controller.registerDraggable(draggable);
+
+            expect(nextSpy).toHaveBeenCalledTimes(1);
         });
     });
 });
