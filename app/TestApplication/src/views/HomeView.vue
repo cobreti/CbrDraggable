@@ -42,7 +42,6 @@
             <span>test 3</span>
         </CbrDraggable> -->
       </div>
-
       <div class="observer-panel" v-for="(item, index) in draggableItems" :key="index">
         <draggable-observer-panel class="draggable-observer-panel" :id="item" :controller="draggableController">
 
