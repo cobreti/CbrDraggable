@@ -11,17 +11,21 @@
                 </div>
                 <div>
                 </div>
-                <div :id="'csv-drop-column-' + index" class="drop-area">
+                <div :id="'drop-column-' + (index + 1)" class="drop-area">
                 </div>
             </div>
       </div>
 
       <div id="chip-area" class="chip-area drop-area">
-        <CbrDraggable id="test" :controller="draggableController" :event-listener="draggableEventListener">
-          <div class="draggable-item">
-            test
-          </div>
-        </CbrDraggable>
+        <span v-for="(item, index) in draggableItems" :key="index">
+          <CbrDraggable :id="item"
+            :controller="draggableController" 
+            :event-listener="draggableEventListener">
+            <div class="draggable-item">
+              {{ item }}
+            </div>
+          </CbrDraggable>
+        </span>
         <!-- <CbrDraggable id="test2" class="draggable-item" :controller="draggableController">
           <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test2')">
             <span>test 2</span>
@@ -39,9 +43,11 @@
         </CbrDraggable> -->
       </div>
 
-      <draggable-observer-panel class="draggable-observer-panel" id="test" :controller="draggableController">
+      <div class="observer-panel" v-for="(item, index) in draggableItems" :key="index">
+        <draggable-observer-panel class="draggable-observer-panel" :id="item" :controller="draggableController">
 
-      </draggable-observer-panel>
+        </draggable-observer-panel>
+      </div>
     </div>
 </template>
 
@@ -50,9 +56,16 @@
 
 <style scoped>
 
-  .draggable-observer-panel {
-    width: 90%;
+  .observer-panel {
+    display: inline-block;
+    width: calc(50% - 2em);
     border: 1px solid black;
+    margin-left: 1em;
+    margin-bottom: 1em;
+  }
+
+  .draggable-observer-panel {
+    /* width: 50%; */
     margin-left: 1em;
   }
 
@@ -132,6 +145,17 @@
     pinAreaSelector: '.drop-area',
     freeAreaSelector: '.chip-area',
   }));
+
+  const draggableItems = ref([
+    "item-1",
+    "item-2",
+    "item-3",
+    "item-4",
+    "item-5",
+    "item-6",
+    "item-7",
+    "item-8"
+  ]);
 
   class DraggableEventListener implements CbrDraggableEventsListenerInterface {
     onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
