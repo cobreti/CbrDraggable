@@ -58,7 +58,7 @@
   });
 
   const showAddIcon : Ref<boolean> = computed(() => {
-    return state.value?.hoverArea != undefined;
+    return state.value?.hoverArea != undefined && state.value?.hoverArea !== props.controller.freeAreaElement;
   });
 
   const showRemoveIcon: Ref<boolean> = computed(() => {
