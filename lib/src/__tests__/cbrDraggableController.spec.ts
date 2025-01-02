@@ -3,8 +3,10 @@ import { CbrDraggableController, CbrDraggableControllerOptions, DraggableBehavio
 import { JSDOM } from 'jsdom';
 import { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
-import { BehaviorSubject } from 'rxjs';
-// import { CbrHoverEnterDelegate, CbrHoverEnterEvent, CbrHoverExitDelegate, CbrHoverExitEvent, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
+
+declare namespace global {
+    let document: Document;
+}
 
 describe('CbrDraggableController', () => {
 
