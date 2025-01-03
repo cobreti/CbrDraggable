@@ -8,6 +8,8 @@ export interface CbrDraggableEventsListenerInterface {
     onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void
     onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void;
     onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void;
+    onDragStart(draggable: CbrDraggableInterface): void;
+    onDragEnd(draggable: CbrDraggableInterface): void;
     onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void;
 }
 
@@ -18,6 +20,7 @@ export interface CbrDraggableInterface {
     readonly showRemoveIcon : Ref<boolean>;
     readonly pinArea: Element | null;
     readonly hoverArea: Element | null;
+    readonly element: HTMLElement;
 
     unpin() : void;
     pin(pinArea: HTMLElement):void;

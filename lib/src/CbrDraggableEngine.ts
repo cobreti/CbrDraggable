@@ -30,11 +30,13 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     readonly draggedElm_ : Ref<HTMLElement | null> = ref(null);
 
-    readonly freeArea_ : Ref<Element | null> = ref(null);
+    readonly freeArea_ : Ref<HTMLElement | null> = ref(null);
 
     readonly draggableRef_ : Ref<HTMLElement | null> = ref(null);
 
     readonly orgPosition_ : Ref<string> = ref('');
+
+    readonly orgParent_ : Ref<HTMLElement | null> = ref(null);
 
     constructor(private readonly props_: CbrDraggableProps, divRefName = 'draggableContent') {
         this.draggableRef_ = useTemplateRef(divRefName);
@@ -49,12 +51,13 @@ export class DraggableEngine implements CbrDraggableInterface {
     get state(): Ref<CbrDraggableState> { return this.state_ }
 
     get draggedElm() : Ref<HTMLElement | null> { return this.draggedElm_ }
-    get freeArea() : Ref<Element | null> { return this.freeArea_ }
+    get freeArea() : Ref<HTMLElement | null> { return this.freeArea_ }
     get draggableRef() : Ref<HTMLElement | null> { return this.draggableRef_ }
     get orgPosition() : Ref<string> { return this.orgPosition_ }
 
-    get pinArea(): Element | null { return this.state.value.pinArea }
-    get hoverArea(): Element | null { return this.state.value.hoverArea }
+    get pinArea(): HTMLElement | null { return this.state.value.pinArea }
+    get hoverArea(): HTMLElement | null { return this.state.value.hoverArea }
+    get element(): HTMLElement { return this.draggedElm.value }
 
     unpin() {
         if (!this.draggedElm.value) {
@@ -160,7 +163,7 @@ export class DraggableEngine implements CbrDraggableInterface {
      * @param x
      * @param y
      */
-    getPinAreaFromPoint(x: number, y: number): Element | undefined {
+    getPinAreaFromPoint(x: number, y: number): HTMLElement | undefined {
         return this.props.controller.getPinAreaFromPoint(x, y);
     }
 
@@ -182,15 +185,22 @@ export class DraggableEngine implements CbrDraggableInterface {
      * on drag start event handler
      *  called by mouse down or touch start event
      */
-    onDragStart() {
+    onDragStart(clientX: number, clientY: number) {
         if (!this.draggableRef.value)
             return;
 
         if (!this.draggedElm.value)
             return;
 
+        this.forEachListener((listener) => listener.onDragStart(this));
+
+
         this.orgPosition.value = this.draggedElm.value.style.position
         this.draggedElm.value.style.position = 'fixed'
+        this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
+        this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
+        this.orgParent_.value = this.draggedElm.value.parentElement;
+        document.body.appendChild(this.draggedElm.value);
         this.setState({
             state: CbrDraggableStateEnum.DRAGGING,
             hoverArea: this.state.value.pinArea,
@@ -210,8 +220,8 @@ export class DraggableEngine implements CbrDraggableInterface {
             return
         }
 
-        this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`
-        this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`
+        this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
+        this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
 
         let dropArea = this.getPinAreaFromPoint(clientX, clientY)
 
@@ -265,11 +275,15 @@ export class DraggableEngine implements CbrDraggableInterface {
             return
         }
 
+        this.forEachListener((listener) => listener.onDragEnd(this));
+
         if (this.state.value.hoverArea && this.draggedElm.value) {
             this.pin(this.state.value.hoverArea as HTMLElement);
         }
         else {
             console.log('draggable not over a drop area');
+            this.orgParent_.value.appendChild(this.draggedElm.value);
+            this.orgParent_.value = null;
             this.props.controller?.resetElementPosition(this.draggedElm.value);
         }
 
@@ -366,7 +380,7 @@ export class DraggableEngine implements CbrDraggableInterface {
 
         event.preventDefault()
 
-        this.onDragStart();
+        this.onDragStart(event.clientX, event.clientY);
 
         return true;
     }
@@ -393,7 +407,7 @@ export class DraggableEngine implements CbrDraggableInterface {
 
         event.preventDefault();
 
-        this.onDragStart();
+        this.onDragStart(event.touches[0].clientX, event.touches[0].clientY);
 
         return true;
     }

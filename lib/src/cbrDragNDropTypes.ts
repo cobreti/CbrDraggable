@@ -31,8 +31,8 @@ export enum CbrDraggableStateEnum {
 
 export type CbrDraggableState = {
   state: CbrDraggableStateEnum,
-  pinArea?: Element,
-  hoverArea?: Element
+  pinArea?: HTMLElement,
+  hoverArea?: HTMLElement
 };
 
 export enum DragnDropEvents {

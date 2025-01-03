@@ -28,8 +28,9 @@ describe('CbrDraggableController', () => {
         get id() { return draggableObjectId; }
         get showAddIcon(): Ref<boolean> { return this.showAddIcon_; }
         get showRemoveIcon(): Ref<boolean> { return this.showRemoveIcon_; }
-        get pinArea(): Element | null { return null; }
-        get hoverArea(): Element | null { return null;}
+        get pinArea(): HTMLElement | null { return null; }
+        get hoverArea(): HTMLElement | null { return null;}
+        get element(): HTMLElement | null { return null; }
 
         unpin(): void {}
         pin(pinArea: HTMLElement): void {}

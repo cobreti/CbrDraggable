@@ -8,7 +8,7 @@ export interface CbrDraggableControllerInterface {
     freeAreaElement: HTMLElement | null;
     freeAreaSelector: string;
 
-    getPinAreaFromPoint(x: number, y: number): Element | undefined;
+    getPinAreaFromPoint(x: number, y: number): HTMLElement | undefined;
 
     /**
      * return if the given element can be used to start a drag operation
@@ -64,19 +64,19 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
         return document.querySelector(this.freeAreaSelector_) as HTMLElement;
     }
 
-    getPinAreaFromPoint(x: number, y: number): Element | undefined {
+    getPinAreaFromPoint(x: number, y: number): HTMLElement | undefined {
         if (this.pinAreaSelector_ === '') {
           return undefined
         }
     
         let elements: Element[] | null = null
-        let dropArea : Element | undefined = undefined;
+        let dropArea : HTMLElement | undefined = undefined;
     
         elements = document.elementsFromPoint(x, y);
 
         dropArea = elements.find((element) => {
-            return element.matches(this.pinAreaSelector_)
-        })
+            return element.matches(this.pinAreaSelector_);
+        }) as HTMLElement;
     
         return dropArea;
     }

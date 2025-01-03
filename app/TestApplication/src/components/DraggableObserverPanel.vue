@@ -77,6 +77,10 @@
             lastStateChange.value = `${newState.state}`;
             this.globalUpdates(draggable);
         }
+        onDragStart(draggable: CbrDraggableInterface): void {
+        }
+        onDragEnd(draggable: CbrDraggableInterface): void {
+        }
 
         globalUpdates(draggable: CbrDraggableInterface): void {
 
@@ -116,7 +120,6 @@
         .pipe(first())
         .subscribe(draggable => {
             draggable?.addEventListener(listener);
-            // console.log('draggable', draggable);
         });
     });
 
