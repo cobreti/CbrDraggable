@@ -19,29 +19,15 @@
       <div id="chip-area" class="chip-area drop-area">
         <span v-for="(item, index) in draggableItems" :key="index">
           <CbrDraggable :id="item"
-            :controller="draggableController" 
+            :controller="draggableController"
             :event-listener="draggableEventListener">
             <div class="draggable-item">
               {{ item }}
             </div>
           </CbrDraggable>
         </span>
-        <!-- <CbrDraggable id="test2" class="draggable-item" :controller="draggableController">
-          <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test2')">
-            <span>test 2</span>
-          </BdgDraggableItem>
-
-        </CbrDraggable>
-        <CbrDraggable id="test" class="draggable-item" :controller="draggableController">
-          <BdgDraggableItem :draggableObserver="draggableController.getDraggableObserver('test')">
-            <span>test</span>
-          </BdgDraggableItem>
-        </CbrDraggable>
-
-        <CbrDraggable id="test 3" class="draggable-item" :controller="draggableController">
-            <span>test 3</span>
-        </CbrDraggable> -->
       </div>
+      <div class="draggable-info-title">Draggables live informations</div>
       <div class="observer-panel" v-for="(item, index) in draggableItems" :key="index">
         <draggable-observer-panel class="draggable-observer-panel" :id="item" :controller="draggableController">
 
@@ -55,26 +41,26 @@
 
 <style scoped>
 
+  .draggable-info-title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+
   .observer-panel {
     display: inline-block;
-    width: calc(50% - 2em);
-    border: 1px solid black;
+    width: calc(100% - 2em);
     margin-left: 1em;
-    margin-bottom: 1em;
   }
 
   .draggable-observer-panel {
-    /* width: 50%; */
     margin-left: 1em;
   }
-
 
   .draggable-item {
     display: inline-block;
     position: relative;
     background-color: lightgray;
     padding: 0.25em;
-    /* margin: 0.5em; */
     border: 1px solid blue;
     border-radius: 0.5em;
     min-width: 3em;
