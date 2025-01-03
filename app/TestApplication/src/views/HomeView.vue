@@ -1,21 +1,24 @@
 <template>
     <div>
+        <div class="selector-title">Drop areas</div>
         <div class="d-flex flex-row justify-start align-content-space-evenly selector">
             <div v-for="(n, index) in columnsCount"
                 :key="index"
                 :id="'csv-column-' + index"
                 class="column-cell"
             >
-                <div class="column-cell-text">
-                    {{ currentRow[index] }}
-                </div>
-                <div>
-                </div>
-                <div :id="'drop-column-' + (index + 1)" class="drop-area">
-                </div>
+              <v-card elevated>
+                <v-card-title>{{ currentRow[index] }}</v-card-title>
+                <v-card-subtitle>drop-column-{{index+1}}</v-card-subtitle>
+                <v-card-text>
+                  <div :id="'drop-column-' + (index + 1)" class="drop-area">
+                  </div>
+                </v-card-text>
+              </v-card>
             </div>
       </div>
 
+      <div class="draggable-title">Draggables</div>
       <div id="chip-area" class="chip-area drop-area">
         <span v-for="(item, index) in draggableItems" :key="index">
           <CbrDraggable :id="item"
@@ -40,6 +43,11 @@
 </style>
 
 <style scoped>
+
+  .draggable-title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
 
   .draggable-info-title {
     font-weight: bold;
@@ -70,25 +78,32 @@
 
   .drop-area {
     display: block;
-    height: 3em;
+    min-height: 3em;
     padding: 0.25em;
     border: 1px solid blue;
     margin: 1em;
+    margin-top: 0em;
+
   }
 
   .chip-area {
     display: block;
-    margin-top: 3em;
     padding: 0.25em;
     border: 1px solid blue;
     min-height: 4em;
   }
 
+  .selector-title {
+    font-weight: bold;
+    margin-bottom: 0.5em;
+  }
+
   .selector {
     border: 1px dotted black;
-    width: 100%;
-    height: 100%;
     display: block;
+    margin-bottom: 1em;
+    margin-left: 1em;
+    margin-right: 1em;
   }
 
   .column-cell {
