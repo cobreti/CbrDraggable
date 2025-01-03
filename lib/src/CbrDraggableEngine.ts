@@ -53,6 +53,9 @@ export class DraggableEngine implements CbrDraggableInterface {
     get draggableRef() : Ref<HTMLElement | null> { return this.draggableRef_ }
     get orgPosition() : Ref<string> { return this.orgPosition_ }
 
+    get pinArea(): Element | null { return this.state.value.pinArea }
+    get hoverArea(): Element | null { return this.state.value.hoverArea }
+
     unpin() {
         if (!this.draggedElm.value) {
             return

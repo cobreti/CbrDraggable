@@ -16,6 +16,8 @@ export interface CbrDraggableInterface {
     readonly id: string;
     readonly showAddIcon : Ref<boolean>;
     readonly showRemoveIcon : Ref<boolean>;
+    readonly pinArea: Element | null;
+    readonly hoverArea: Element | null;
 
     unpin() : void;
     pin(pinArea: HTMLElement):void;

@@ -13,6 +13,12 @@
           <div class="d-flex flex-row justify-start">
             <span>show add icon : {{ showAddIcon }}</span>
           </div>
+          <div class="d-flex flex-row justify-start">
+            <span>pin area : {{ pinArea }}</span>
+          </div>
+          <div class="d-flex flex-row justify-start">
+            <span>hover area : {{ hoverArea }}</span>
+          </div>
         </div>
     </div>
 </template>
@@ -41,34 +47,58 @@
     const lastEvent = ref<string>('');
     const lastStateChange = ref<string>('');
     const showAddIcon = ref<string>('');
+    const pinArea = ref<string>('');
+    const hoverArea = ref<string>('');
 
     class EventsListener implements CbrDraggableEventsListenerInterface {
         onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
             lastEvent.value = `onHoverEnter : ${event.dropArea?.id}`;
-            this.updateShowFlags(draggable);
+            this.globalUpdates(draggable);
         }
         onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void {
             lastEvent.value = `onHoverExit : ${event.dropArea?.id}`;
-            this.updateShowFlags(draggable);
+            this.globalUpdates(draggable);
         }
         onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void {
             lastEvent.value = `onPin : ${event.pinArea.id}`;
-            this.updateShowFlags(draggable);
+            this.globalUpdates(draggable);
         }
         onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
             lastEvent.value = `onUnpin : ${event.pinArea?.id}`;
-            this.updateShowFlags(draggable);
+            this.globalUpdates(draggable);
         }
         onStateChanged(draggable: CbrDraggableInterface, newState: CbrDraggableState): void {
             lastStateChange.value = `${newState.state}`;
-            this.updateShowFlags(draggable);
+            this.globalUpdates(draggable);
         }
 
-        updateShowFlags(draggable: CbrDraggableInterface): void {
+        globalUpdates(draggable: CbrDraggableInterface): void {
+
+          //
+          // update show add icon
+          //
           if (draggable.showAddIcon.value ) {
             showAddIcon.value = 'show add icon';
           } else {
             showAddIcon.value = 'hide add icon';
+          }
+
+          //
+          // update pin area
+          //
+          if (draggable.pinArea) {
+            pinArea.value = draggable.pinArea.id;
+          } else {
+            pinArea.value = 'no pin area';
+          }
+
+          //
+          // update hover area
+          //
+          if (draggable.hoverArea) {
+            hoverArea.value = draggable.hoverArea.id;
+          } else {
+            hoverArea.value = 'no hover area';
           }
         }
     }
