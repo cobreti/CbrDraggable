@@ -10,6 +10,9 @@
             <div class="d-flex flex-row justify-start">
                 <span>Last state changed : {{ lastStateChange }}</span>
             </div>
+          <div class="d-flex flex-row justify-start">
+            <span>show add icon : {{ showAddIcon }}</span>
+          </div>
         </div>
     </div>
 </template>
@@ -37,22 +40,36 @@
 
     const lastEvent = ref<string>('');
     const lastStateChange = ref<string>('');
+    const showAddIcon = ref<string>('');
 
     class EventsListener implements CbrDraggableEventsListenerInterface {
         onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
             lastEvent.value = `onHoverEnter : ${event.dropArea?.id}`;
+            this.updateShowFlags(draggable);
         }
         onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void {
             lastEvent.value = `onHoverExit : ${event.dropArea?.id}`;
+            this.updateShowFlags(draggable);
         }
         onPin(draggable: CbrDraggableInterface, event: CbrPinEvent): void {
             lastEvent.value = `onPin : ${event.pinArea.id}`;
+            this.updateShowFlags(draggable);
         }
         onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
             lastEvent.value = `onUnpin : ${event.pinArea?.id}`;
+            this.updateShowFlags(draggable);
         }
         onStateChanged(draggable: CbrDraggableInterface, newState: CbrDraggableState): void {
             lastStateChange.value = `${newState.state}`;
+            this.updateShowFlags(draggable);
+        }
+
+        updateShowFlags(draggable: CbrDraggableInterface): void {
+          if (draggable.showAddIcon.value ) {
+            showAddIcon.value = 'show add icon';
+          } else {
+            showAddIcon.value = 'hide add icon';
+          }
         }
     }
 
@@ -65,6 +82,6 @@
             draggable?.addEventListener(listener);
             // console.log('draggable', draggable);
         });
-    });   
+    });
 
 </script>

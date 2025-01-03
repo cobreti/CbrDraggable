@@ -1,3 +1,6 @@
+import type {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
+import type {CbrDraggableEventsListenerInterface} from '@/cbrDraggableInterface.js';
+
 export type CbrHoverEnterEvent = {
   element: Element,
   dropArea?: Element,
@@ -41,6 +44,13 @@ export enum DragnDropEvents {
   UNPINNED = 'cbr-dragdrop:unpinned',
   // sent to pin the draggable element
   PIN = 'cbr-dragdrop:pin'
+}
+
+
+export type CbrDraggableProps = {
+  id: string,
+  controller: CbrDraggableControllerInterface,
+  eventListener?: CbrDraggableEventsListenerInterface
 };
 
 
