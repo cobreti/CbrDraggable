@@ -18,8 +18,8 @@
             </div>
       </div>
 
-      <div class="draggable-title">Draggables</div>
-      <div id="chip-area" class="chip-area drop-area">
+      <div class="draggable-title">Draggables (available zone)</div>
+      <v-card id="chip-area" class="chip-area drop-area">
         <span v-for="(item, index) in draggableItems" :key="index">
           <CbrDraggable :id="item"
             :controller="draggableController"
@@ -29,7 +29,7 @@
             </div>
           </CbrDraggable>
         </span>
-      </div>
+      </v-card>
       <div class="draggable-info-title">Draggables live informations</div>
       <div class="observer-panel" v-for="(item, index) in draggableItems" :key="index">
         <draggable-observer-panel class="draggable-observer-panel" :id="item" :controller="draggableController">
@@ -80,16 +80,13 @@
     display: block;
     min-height: 3em;
     padding: 0.25em;
-    border: 1px solid blue;
-    margin: 1em;
-    margin-top: 0em;
-
+    margin: 0em 1em 1em;
+    box-shadow: #7f7f7f 0.05em 0.05em 0.05em 0.1em;
   }
 
   .chip-area {
     display: block;
     padding: 0.25em;
-    border: 1px solid blue;
     min-height: 4em;
   }
 
@@ -99,7 +96,6 @@
   }
 
   .selector {
-    border: 1px dotted black;
     display: block;
     margin-bottom: 1em;
     margin-left: 1em;
@@ -111,7 +107,6 @@
     flex-direction: column;
     justify-content: center;
     cursor: default;
-    border: 1px solid black;
     width: 100%;
     min-width: 1em;
     min-height: 2em;
@@ -127,7 +122,6 @@
 
   .log-area {
     display: block;
-    border: 1px solid black;
     margin-left: 1em;
     width: 80%;
     height: 10em;
