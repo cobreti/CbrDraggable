@@ -20,8 +20,14 @@ import {
 import
     CbrDraggable from './cbrDraggable.vue';
 
+import CbrDraggableOnAdd from './cbrDraggableOnAdd.vue';
+import CbrDraggableOnRemove from '@/cbrDraggableOnRemove.vue';
+
+import { CbrDraggableEventsListener } from './cbrDraggableEventsListener.ts';
+
 export {
     type CbrDraggableEventsListenerInterface,
+    CbrDraggableEventsListener,
     type CbrDraggableControllerInterface,
     CbrDraggableController,
     type CbrDraggableInterface,
@@ -32,6 +38,8 @@ export {
     DragnDropEvents,
     type CbrUnpinnedEvent,
     type CbrPinEvent,
-    CbrDraggable
+    CbrDraggable,
+    CbrDraggableOnAdd,
+    CbrDraggableOnRemove
  };
 

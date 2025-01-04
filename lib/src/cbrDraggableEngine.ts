@@ -1,4 +1,4 @@
-import {computed, ref, Ref, useTemplateRef} from 'vue';
+import {computed, ref, Ref, useTemplateRef, watch} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
@@ -7,26 +7,21 @@ import {
     CbrPinEvent,
     CbrUnpinnedEvent
 } from '@/cbrDragNDropTypes.js';
+import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 
-export   type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
+export type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
+
+export class ExternalStateSet extends Map<string, any> {}
 
 export class DraggableEngine implements CbrDraggableInterface {
 
     readonly eventListeners_: EventListenersInterfacesTable = new Set();
 
-    readonly showAddIcon_: Ref<boolean> = computed(() => {
-        return this.state.value?.hoverArea != undefined &&
-            this.state.value?.hoverArea !== this.props.controller.freeAreaElement;
-    });
-
-    readonly showRemoveIcon_: Ref<boolean> = computed(() => {
-        return this.state.value?.pinArea != undefined &&
-            this.state.value?.state != 'dragging';
-    });
-
     readonly state_: Ref<CbrDraggableState> = ref({
         state: CbrDraggableStateEnum.FREE
     });
+
+    readonly externalStates_: ExternalStateSet = new ExternalStateSet();
 
     readonly draggedElm_ : Ref<HTMLElement | null> = ref(null);
 
@@ -45,9 +40,6 @@ export class DraggableEngine implements CbrDraggableInterface {
     get props(): CbrDraggableProps { return this.props_ }
     get id(): string { return this.props.id}
 
-    get showAddIcon(): Ref<boolean> { return this.showAddIcon_ }
-    get showRemoveIcon(): Ref<boolean> { return this.showRemoveIcon_ }
-
     get state(): Ref<CbrDraggableState> { return this.state_ }
 
     get draggedElm() : Ref<HTMLElement | null> { return this.draggedElm_ }
@@ -58,6 +50,7 @@ export class DraggableEngine implements CbrDraggableInterface {
     get pinArea(): HTMLElement | null { return this.state.value.pinArea }
     get hoverArea(): HTMLElement | null { return this.state.value.hoverArea }
     get element(): HTMLElement { return this.draggedElm.value }
+    get controller(): CbrDraggableControllerInterface | null { return this.props_.controller }
 
     unpin() {
         if (!this.draggedElm.value) {
@@ -145,6 +138,18 @@ export class DraggableEngine implements CbrDraggableInterface {
         });
     }
 
+    updateExternalState(externalState: string, value: any) {
+        const oldValue = this.externalStates_.get(externalState);
+        this.externalStates_.set(externalState, value);
+
+        this.forEachListener((eventListener) => {
+            eventListener.onExternalStateChanged(this, externalState, oldValue, value);
+        });
+    }
+
+    getExternalState(externalState: string): any {
+        return this.externalStates_.get(externalState);
+    }
 
     addEventListener(eventListener: CbrDraggableEventsListenerInterface) {
         this.eventListeners_.add(eventListener);

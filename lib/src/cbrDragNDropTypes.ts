@@ -1,5 +1,6 @@
 import type {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import type {CbrDraggableEventsListenerInterface} from '@/cbrDraggableInterface.js';
+import {Ref} from 'vue';
 
 export type CbrHoverEnterEvent = {
   element: Element,

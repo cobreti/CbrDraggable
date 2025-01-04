@@ -22,11 +22,18 @@
       <v-card id="chip-area" class="chip-area drop-area">
         <span v-for="(item, index) in draggableItems" :key="index">
           <CbrDraggable :id="item"
+            class="draggable-item"
             :controller="draggableController"
             :event-listener="draggableEventListener">
-            <div class="draggable-item">
+            <div>
               {{ item }}
             </div>
+            <cbr-draggable-on-add class="draggable-item-icon">
+              <v-icon class="add-icon" icon="mdi-plus-circle-outline"></v-icon>
+            </cbr-draggable-on-add>
+            <cbr-draggable-on-remove class="draggable-item-icon">
+               <v-icon class="remove-icon" icon="mdi-close-circle-outline"></v-icon>
+            </cbr-draggable-on-remove>
           </CbrDraggable>
         </span>
       </v-card>
@@ -73,7 +80,31 @@
     border-radius: 0.5em;
     min-width: 3em;
     text-align: center;
-    cursor: pointer;
+    cursor: grab;
+
+    > div {
+      display: inline-block;
+    }
+
+    .draggable-item-icon {
+      display: inline-block;
+      width: 0;
+      height: 0;
+    }
+
+    .add-icon {
+      color: green;
+      width: 0;
+      transform: translate(-25%, -50%);
+      cursor: default;
+    }
+
+    .remove-icon {
+      color: red;
+      transform: translate(-25%, -50%);
+      cursor: pointer;
+    }
+
   }
 
   .drop-area {
@@ -133,7 +164,7 @@
 <script setup lang="ts">
   import DraggableObserverPanel from '../components/DraggableObserverPanel.vue';
   import {computed, ref} from 'vue';
-  import { CbrDraggable, CbrDraggableController, type CbrDraggableEventsListenerInterface, type CbrDraggableInterface, type CbrDraggableState, type CbrHoverEnterEvent, type CbrHoverExitEvent, type CbrPinEvent, type CbrUnpinnedEvent } from 'cbr-draggable';
+  import { CbrDraggable, CbrDraggableOnAdd, CbrDraggableOnRemove, CbrDraggableController, type CbrDraggableEventsListenerInterface, type CbrDraggableInterface, type CbrDraggableState, type CbrHoverEnterEvent, type CbrHoverExitEvent, type CbrPinEvent, type CbrUnpinnedEvent } from 'cbr-draggable';
 
   const draggableController = ref(new CbrDraggableController({
     pinAreaSelector: '.drop-area',

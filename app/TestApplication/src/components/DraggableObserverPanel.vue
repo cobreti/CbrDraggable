@@ -14,9 +14,6 @@
                   <span>Last state changed : {{ lastStateChange }}</span>
                 </div>
                 <div class="d-flex flex-row justify-start">
-                  <span>show add icon : {{ showAddIcon }}</span>
-                </div>
-                <div class="d-flex flex-row justify-start">
                   <span>pin area : {{ pinArea }}</span>
                 </div>
                 <div class="d-flex flex-row justify-start">
@@ -49,10 +46,8 @@
         controller: CbrDraggableControllerInterface
     }>();
 
-    const isAllExpended = ref<boolean>(true);
     const lastEvent = ref<string>('');
     const lastStateChange = ref<string>('');
-    const showAddIcon = ref<string>('');
     const pinArea = ref<string>('');
     const hoverArea = ref<string>('');
 
@@ -81,17 +76,10 @@
         }
         onDragEnd(draggable: CbrDraggableInterface): void {
         }
+        onExternalStateChanged(draggable: CbrDraggableInterface, externalState: string, oldValue: any, newValue: any) {
+        }
 
-        globalUpdates(draggable: CbrDraggableInterface): void {
-
-          //
-          // update show add icon
-          //
-          if (draggable.showAddIcon.value ) {
-            showAddIcon.value = 'show add icon';
-          } else {
-            showAddIcon.value = 'hide add icon';
-          }
+      globalUpdates(draggable: CbrDraggableInterface): void {
 
           //
           // update pin area

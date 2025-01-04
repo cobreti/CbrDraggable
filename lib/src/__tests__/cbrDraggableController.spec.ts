@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, test, vi } from 'vitest';
-import { CbrDraggableController, CbrDraggableControllerOptions, DraggableBehaviorSubject } from '../cbrDraggableController.ts';
+import {
+    CbrDraggableController,
+    CbrDraggableControllerInterface,
+    CbrDraggableControllerOptions,
+    DraggableBehaviorSubject
+} from '../cbrDraggableController.ts';
 import { JSDOM } from 'jsdom';
 import { CbrDraggableEventsListenerInterface, CbrDraggableInterface } from '@/cbrDraggableInterface.ts';
 import { ref, Ref } from 'vue';
@@ -15,12 +20,9 @@ describe('CbrDraggableController', () => {
     const draggableObjectId = 'draggable-object-id';
 
     class DraggableObject implements CbrDraggableInterface {
-        addEventListener(eventListener: CbrDraggableEventsListenerInterface) {
-        }
-        removeEventListener(eventListener: CbrDraggableEventsListenerInterface) {
-        }
-        forEachListener(callback: (eventListener: CbrDraggableEventsListenerInterface) => void) {
-        }
+        addEventListener(eventListener: CbrDraggableEventsListenerInterface) {}
+        removeEventListener(eventListener: CbrDraggableEventsListenerInterface) {}
+        forEachListener(callback: (eventListener: CbrDraggableEventsListenerInterface) => void) {}
 
         showAddIcon_: Ref<boolean> = ref(true);
         showRemoveIcon_: Ref<boolean> = ref(true);
@@ -31,9 +33,13 @@ describe('CbrDraggableController', () => {
         get pinArea(): HTMLElement | null { return null; }
         get hoverArea(): HTMLElement | null { return null;}
         get element(): HTMLElement | null { return null; }
+        get controller(): CbrDraggableControllerInterface | null { return null; };
 
         unpin(): void {}
         pin(pinArea: HTMLElement): void {}
+
+        updateExternalState(externalState: string, value: any) {}
+        getExternalState(externalState: string): any { return null; }
     }
 
     let jsdom : JSDOM;

@@ -39,15 +39,22 @@
 
 <script setup lang="ts">
 
-  import { onMounted } from 'vue'
+  import {onMounted, provide} from 'vue'
   import {
     CbrDraggableProps,
   } from './cbrDragNDropTypes'
-  import {DraggableEngine} from '@/CbrDraggableEngine.js';
+  import {DraggableEngine} from '@/cbrDraggableEngine.js';
+  import {draggableInjectionKey} from '@/keys.js';
+  import {CbrDraggableEventsListener_ESAdd} from '@/cbrDraggableEventsListener_ESAdd.js';
+  import {CbrDraggableEventsListener_ESRemove} from '@/cbrDraggableEventsListener_ESRemove.js';
 
-  const props = defineProps<CbrDraggableProps>()
+  const props = defineProps<CbrDraggableProps>();
 
   const draggableCore : DraggableEngine = new DraggableEngine(props);
+  draggableCore.addEventListener(new CbrDraggableEventsListener_ESAdd());
+  draggableCore.addEventListener(new CbrDraggableEventsListener_ESRemove());
+
+  provide(draggableInjectionKey, draggableCore);
 
   onMounted(() => draggableCore.onMounted());
 
