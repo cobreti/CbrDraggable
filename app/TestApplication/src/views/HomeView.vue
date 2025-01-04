@@ -198,6 +198,13 @@
     onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void {
       console.log(`${draggable.id} -- onStateChanged: ${state.state}`);
     }
+    onExternalStateChanged(draggable: CbrDraggableInterface, externalState: string, oldValue: any, newValue: any) {
+    }
+    onDragStart(draggable: CbrDraggableInterface) {
+    }
+
+    onDragEnd(draggable: CbrDraggableInterface) {
+    }
   }
 
   const draggableEventListener = ref(new DraggableEventListener());
