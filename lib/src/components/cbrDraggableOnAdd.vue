@@ -15,7 +15,7 @@
   import {inject, ref, Ref} from 'vue';
   import {draggableESShowAdd, draggableInjectionKey} from '@/keys.js';
   import {CbrDraggableInterface} from '@/cbrDraggableInterface.js';
-  import {CbrDraggableEventsListener} from '@/cbrDraggableEventsListener.js';
+  import {CbrDraggableEventsListener} from '@/eventsListeners/cbrDraggableEventsListener.js';
 
   const draggableCore : CbrDraggableInterface = inject(draggableInjectionKey);
 

@@ -1,4 +1,4 @@
-import {CbrDraggableEventsListener} from '@/cbrDraggableEventsListener.js';
+import {CbrDraggableEventsListener} from '@/eventsListeners/cbrDraggableEventsListener.js';
 import {draggableESShowAdd} from '@/keys.js';
 
 export class CbrDraggableEventsListener_ESAdd extends CbrDraggableEventsListener {

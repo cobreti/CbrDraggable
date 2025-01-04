@@ -13,17 +13,16 @@ import {
 import {
     type CbrHoverEnterEvent,
     type CbrHoverExitEvent,
-    DragnDropEvents,
     type CbrUnpinnedEvent,
     type CbrPinEvent } from './cbrDragNDropTypes.ts';
 
 import
-    CbrDraggable from './cbrDraggable.vue';
+    CbrDraggable from './components/cbrDraggable.vue';
 
-import CbrDraggableOnAdd from './cbrDraggableOnAdd.vue';
-import CbrDraggableOnRemove from '@/cbrDraggableOnRemove.vue';
+import CbrDraggableOnAdd from './components/cbrDraggableOnAdd.vue';
+import CbrDraggableOnRemove from '@/components/cbrDraggableOnRemove.vue';
 
-import { CbrDraggableEventsListener } from './cbrDraggableEventsListener.ts';
+import { CbrDraggableEventsListener } from './eventsListeners/cbrDraggableEventsListener.ts';
 
 export {
     type CbrDraggableEventsListenerInterface,
@@ -35,7 +34,6 @@ export {
     type CbrDraggableState,
     type CbrHoverEnterEvent,
     type CbrHoverExitEvent,
-    DragnDropEvents,
     type CbrUnpinnedEvent,
     type CbrPinEvent,
     CbrDraggable,

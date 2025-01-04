@@ -42,11 +42,11 @@
   import {onMounted, provide} from 'vue'
   import {
     CbrDraggableProps,
-  } from './cbrDragNDropTypes'
+  } from '../cbrDragNDropTypes.js'
   import {DraggableEngine} from '@/cbrDraggableEngine.js';
   import {draggableInjectionKey} from '@/keys.js';
-  import {CbrDraggableEventsListener_ESAdd} from '@/cbrDraggableEventsListener_ESAdd.js';
-  import {CbrDraggableEventsListener_ESRemove} from '@/cbrDraggableEventsListener_ESRemove.js';
+  import {CbrDraggableEventsListener_ESAdd} from '@/eventsListeners/cbrDraggableEventsListener_ESAdd.js';
+  import {CbrDraggableEventsListener_ESRemove} from '@/eventsListeners/cbrDraggableEventsListener_ESRemove.js';
 
   const props = defineProps<CbrDraggableProps>();
 

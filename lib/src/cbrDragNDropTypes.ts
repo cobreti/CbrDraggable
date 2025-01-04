@@ -1,6 +1,5 @@
 import type {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import type {CbrDraggableEventsListenerInterface} from '@/cbrDraggableInterface.js';
-import {Ref} from 'vue';
 
 export type CbrHoverEnterEvent = {
   element: Element,
@@ -36,17 +35,6 @@ export type CbrDraggableState = {
   hoverArea?: HTMLElement
 };
 
-export enum DragnDropEvents {
-  HOVER_ENTER = 'cbr-dragdrop:hoverenter',
-  HOVER_EXIT = 'cbr-dragdrop:hoverexit',
-  // sent after the draggable element has been pinned
-  PINNED = 'cbr-dragdrop:pinned',
-  // sent after the draggable element has been unpinned
-  UNPINNED = 'cbr-dragdrop:unpinned',
-  // sent to pin the draggable element
-  PIN = 'cbr-dragdrop:pin'
-}
-
 
 export type CbrDraggableProps = {
   id: string,
@@ -54,6 +42,3 @@ export type CbrDraggableProps = {
   eventListener?: CbrDraggableEventsListenerInterface
 };
 
-
-export type CbrHoverEnterDelegate = (event: CbrHoverEnterEvent) => void;
-export type CbrHoverExitDelegate = (event: CbrHoverExitEvent) => void;
