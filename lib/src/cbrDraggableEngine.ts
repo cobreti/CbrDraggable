@@ -1,4 +1,4 @@
-import {computed, ref, Ref, useTemplateRef, watch} from 'vue';
+import {ref, Ref, useTemplateRef} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
@@ -66,8 +66,6 @@ export class DraggableEngine implements CbrDraggableInterface {
             this.forEachListener((eventListener) => {
                 eventListener.onUnpin(this, unpinEvent);
             });
-
-            // props.eventListener?.onUnpin(this, unpinEvent);
         }
 
         this.addToFreeArea();
@@ -94,7 +92,6 @@ export class DraggableEngine implements CbrDraggableInterface {
             this.forEachListener((eventListener) => {
                 eventListener.onUnpin(this, unpinEvent);
             });
-            // props.eventListener?.onUnpin(draggableObject, unpinEvent);
         }
 
 
@@ -106,7 +103,6 @@ export class DraggableEngine implements CbrDraggableInterface {
         this.forEachListener((eventListener) => {
             eventListener.onPin(this, pinEvent);
         });
-        // props.eventListener?.onPin(this, pinEvent);
 
         pinArea.appendChild(this.draggedElm.value);
 
@@ -168,8 +164,8 @@ export class DraggableEngine implements CbrDraggableInterface {
      * @param x
      * @param y
      */
-    getPinAreaFromPoint(x: number, y: number): HTMLElement | undefined {
-        return this.props.controller.getPinAreaFromPoint(x, y);
+    getDropAreaFromPoint(x: number, y: number): HTMLElement | undefined {
+        return this.props.controller.getDropAreaFromPoint(x, y);
     }
 
     onMounted() {
@@ -226,7 +222,7 @@ export class DraggableEngine implements CbrDraggableInterface {
         this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
         this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
 
-        let dropArea = this.getPinAreaFromPoint(clientX, clientY)
+        let dropArea = this.getDropAreaFromPoint(clientX, clientY)
 
         if (dropArea !== this.state.value.hoverArea) {
             if (dropArea) {
@@ -242,7 +238,6 @@ export class DraggableEngine implements CbrDraggableInterface {
                 this.forEachListener((eventListener) => {
                     eventListener.onHoverEnter(this, hoverEnterEvent);
                 });
-                // props.eventListener?.onHoverEnter(draggableObject, hoverEnterEvent);
 
                 if (hoverEnterEvent.dropPrevented) {
                     console.log('drop prevented');
@@ -258,7 +253,6 @@ export class DraggableEngine implements CbrDraggableInterface {
                 this.forEachListener((eventListener) => {
                     eventListener.onHoverExit(this, hoverExitEvent);
                 });
-                // props.eventListener?.onHoverExit(draggableObject, hoverExitEvent);
             }
 
             this.setState({

@@ -196,7 +196,7 @@ describe('CbrDraggableController', () => {
 
             global.document = jsdom.window.document;
 
-            const element = controller.getPinAreaFromPoint(x, y);
+            const element = controller.getDropAreaFromPoint(x, y);
 
             expect(element).not.toBeUndefined();
             expect(element.className).toEqual('pin-area');
@@ -224,7 +224,7 @@ describe('CbrDraggableController', () => {
 
             global.document = jsdom.window.document;
 
-            const element = controller.getPinAreaFromPoint(x, y);
+            const element = controller.getDropAreaFromPoint(x, y);
 
             expect(element).toBeUndefined();
         });
@@ -253,7 +253,7 @@ describe('CbrDraggableController', () => {
 
             global.document = jsdom.window.document;
 
-            const element = controller.getPinAreaFromPoint(x, y);
+            const element = controller.getDropAreaFromPoint(x, y);
 
             expect(element).toBeUndefined();
         });
