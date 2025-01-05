@@ -1,9 +1,7 @@
 <template>
-  <div>
-    <div v-show="show">
-      <slot>
-      </slot>
-    </div>
+  <div v-show="show" @click="onClick">
+    <slot>
+    </slot>
   </div>
 </template>
 
@@ -12,10 +10,12 @@
 </style>
 
 <script setup lang="ts">
-  import {inject, ref, Ref} from 'vue';
+  import {inject, ref, Ref, defineEmits} from 'vue';
   import {draggableESShowRemove, draggableInjectionKey} from '@/keys.js';
   import {CbrDraggableInterface} from '@/cbrDraggableInterface.js';
   import {CbrDraggableEventsListener} from '@/eventsListeners/cbrDraggableEventsListener.js';
+
+  const emit = defineEmits(['click']);
 
   const draggableCore : CbrDraggableInterface = inject(draggableInjectionKey);
 
@@ -30,4 +30,8 @@
   }
 
   draggableCore.addEventListener(new listener());
+
+  function onClick() {
+    emit('click', draggableCore);
+  }
 </script>

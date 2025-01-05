@@ -10,11 +10,13 @@
   */
 
 <template>
-  <div class="draggable-content"
-       @mousedown="onMouseDown"
-       @touchstart="onTouchStart" ref="draggableContent">
-    <slot>
-    </slot>
+  <div class="draggable-content" ref="draggableContent">
+    <div class="draggable-content" @mousedown="onMouseDown" @touchstart="onTouchStart">
+      <slot></slot>
+    </div>
+    <div class="draggable-content">
+      <slot name="decorator"></slot>
+    </div>
   </div>
 </template>
 

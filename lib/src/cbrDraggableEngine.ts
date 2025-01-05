@@ -173,8 +173,6 @@ export class DraggableEngine implements CbrDraggableInterface {
     }
 
     onMounted() {
-        console.log('CbrDraggable mounted');
-
         this.freeArea.value = this.props.controller.freeAreaElement;
         this.draggedElm.value = this.draggableRef.value as HTMLElement;
         this.orgPosition.value = this.draggedElm.value.style.position;

@@ -28,12 +28,14 @@
             <div>
               {{ item }}
             </div>
-            <cbr-draggable-on-add class="draggable-item-icon">
-              <v-icon class="add-icon" icon="mdi-plus-circle-outline"></v-icon>
-            </cbr-draggable-on-add>
-            <cbr-draggable-on-remove class="draggable-item-icon">
-               <v-icon class="remove-icon" icon="mdi-close-circle-outline"></v-icon>
-            </cbr-draggable-on-remove>
+            <template v-slot:decorator>
+              <cbr-draggable-on-add class="draggable-item-icon">
+                <v-icon class="add-icon" icon="mdi-plus-circle-outline"></v-icon>
+              </cbr-draggable-on-add>
+              <cbr-draggable-on-remove class="draggable-item-icon" @click="onRemoveClicked">
+                 <v-icon class="remove-icon" icon="mdi-close-circle-outline"></v-icon>
+              </cbr-draggable-on-remove>
+            </template>
           </CbrDraggable>
         </span>
       </v-card>
@@ -82,7 +84,7 @@
     text-align: center;
     cursor: grab;
 
-    > div {
+    div {
       display: inline-block;
     }
 
@@ -215,6 +217,10 @@
     "column 3"
   ]);
   const columnsCount = computed(() => currentRow.value.length);
+
+  function onRemoveClicked(draggable: CbrDraggableInterface) {
+    draggable.unpin();
+  }
 
 </script>
 
