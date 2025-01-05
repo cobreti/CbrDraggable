@@ -58,7 +58,7 @@
 
   provide(draggableInjectionKey, draggableCore);
 
-  onMounted(() => draggableCore.onMounted());
+  // onMounted(() => draggableCore.onMounted());
 
 
   function onMouseDown(event: MouseEvent) {

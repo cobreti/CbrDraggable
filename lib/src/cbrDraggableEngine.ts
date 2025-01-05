@@ -1,4 +1,4 @@
-import {ref, Ref, useTemplateRef} from 'vue';
+import {ref, Ref, useTemplateRef, onMounted} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
@@ -27,14 +27,25 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     readonly freeArea_ : Ref<HTMLElement | null> = ref(null);
 
-    readonly draggableRef_ : Ref<HTMLElement | null> = ref(null);
-
     readonly orgPosition_ : Ref<string> = ref('');
 
     readonly orgParent_ : Ref<HTMLElement | null> = ref(null);
 
     constructor(private readonly props_: CbrDraggableProps, divRefName = 'draggableContent') {
-        this.draggableRef_ = useTemplateRef(divRefName);
+        const draggableRef = useTemplateRef(divRefName);
+
+        onMounted( () => {
+            this.freeArea.value = this.props.controller.freeAreaElement;
+            this.draggedElm.value = draggableRef.value as HTMLElement;
+            this.orgPosition.value = this.draggedElm.value.style.position;
+
+            this.props.controller?.registerDraggable(this);
+
+            this.forEachListener((eventListener) => {
+                eventListener.onStateChanged(this, this.state.value);
+            });
+        });
+
     }
 
     get props(): CbrDraggableProps { return this.props_ }
@@ -44,7 +55,6 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     get draggedElm() : Ref<HTMLElement | null> { return this.draggedElm_ }
     get freeArea() : Ref<HTMLElement | null> { return this.freeArea_ }
-    get draggableRef() : Ref<HTMLElement | null> { return this.draggableRef_ }
     get orgPosition() : Ref<string> { return this.orgPosition_ }
 
     get pinArea(): HTMLElement | null { return this.state.value.pinArea }
@@ -168,26 +178,11 @@ export class DraggableEngine implements CbrDraggableInterface {
         return this.props.controller.getDropAreaFromPoint(x, y);
     }
 
-    onMounted() {
-        this.freeArea.value = this.props.controller.freeAreaElement;
-        this.draggedElm.value = this.draggableRef.value as HTMLElement;
-        this.orgPosition.value = this.draggedElm.value.style.position;
-
-        this.props.controller?.registerDraggable(this);
-
-        this.forEachListener((eventListener) => {
-            eventListener.onStateChanged(this, this.state.value);
-        });
-    }
-
     /**
      * on drag start event handler
      *  called by mouse down or touch start event
      */
     onDragStart(clientX: number, clientY: number) {
-        if (!this.draggableRef.value)
-            return;
-
         if (!this.draggedElm.value)
             return;
 
