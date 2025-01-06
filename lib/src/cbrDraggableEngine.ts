@@ -45,7 +45,6 @@ export class DraggableEngine implements CbrDraggableInterface {
                 eventListener.onStateChanged(this, this.state.value);
             });
         });
-
     }
 
     get props(): CbrDraggableProps { return this.props_ }
