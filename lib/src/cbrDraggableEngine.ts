@@ -8,6 +8,7 @@ import {
     CbrUnpinnedEvent
 } from '@/cbrDragNDropTypes.js';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
+import {CbrDraggableElement} from '@/cbrDraggableElement.js';
 
 export type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
 
@@ -23,21 +24,26 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     readonly externalStates_: ExternalStateSet = new ExternalStateSet();
 
-    readonly draggedElm_ : Ref<HTMLElement | null> = ref(null);
+    // readonly draggedElm_ : Ref<HTMLElement | null> = ref(null);
 
     readonly freeArea_ : Ref<HTMLElement | null> = ref(null);
 
-    readonly orgPosition_ : Ref<string> = ref('');
+    // readonly orgPosition_ : Ref<string> = ref('');
 
-    readonly orgParent_ : Ref<HTMLElement | null> = ref(null);
+    // readonly orgParent_ : Ref<HTMLElement | null> = ref(null);
+
+    readonly element_: CbrDraggableElement;
 
     constructor(private readonly props_: CbrDraggableProps, divRefName = 'draggableContent') {
-        const draggableRef = useTemplateRef(divRefName);
+
+        this.element_ = new CbrDraggableElement(divRefName);
+
+        // const draggableRef = useTemplateRef(divRefName);
 
         onMounted( () => {
             this.freeArea.value = this.props.controller.freeAreaElement;
-            this.draggedElm.value = draggableRef.value as HTMLElement;
-            this.orgPosition.value = this.draggedElm.value.style.position;
+            // this.draggedElm.value = draggableRef.value as HTMLElement;
+            // this.orgPosition.value = this.draggedElm.value.style.position;
 
             this.props.controller?.registerDraggable(this);
 
@@ -52,23 +58,28 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     get state(): Ref<CbrDraggableState> { return this.state_ }
 
-    get draggedElm() : Ref<HTMLElement | null> { return this.draggedElm_ }
+    // get draggedElm() : Ref<HTMLElement | null> { return this.draggedElm_ }
     get freeArea() : Ref<HTMLElement | null> { return this.freeArea_ }
-    get orgPosition() : Ref<string> { return this.orgPosition_ }
+    // get orgPosition() : Ref<string> { return this.orgPosition_ }
 
     get pinArea(): HTMLElement | null { return this.state.value.pinArea }
     get hoverArea(): HTMLElement | null { return this.state.value.hoverArea }
-    get element(): HTMLElement { return this.draggedElm.value }
+    // get element(): HTMLElement { return this.draggedElm.value }
+    get element(): HTMLElement { return this.element_.htmlElement; }
     get controller(): CbrDraggableControllerInterface | null { return this.props_.controller }
 
     unpin() {
-        if (!this.draggedElm.value) {
-            return
+        if (!this.element_.valid) {
+            return;
         }
+        // if (!this.draggedElm.value) {
+        //     return
+        // }
 
         if (this.state.value.pinArea) {
             const unpinEvent : CbrUnpinnedEvent = {
-                element: this.draggedElm.value,
+                element: this.element_.htmlElement,
+                // element: this.draggedElm.value,
                 pinArea: this.state.value.pinArea!
             }
 
@@ -82,19 +93,24 @@ export class DraggableEngine implements CbrDraggableInterface {
             state: CbrDraggableStateEnum.FREE
         });
 
-        this.draggedElm.value.style.left  = "";
-        this.draggedElm.value.style.top  = "";
-        this.draggedElm.value.style.position = this.orgPosition.value;
+        this.element_.restoreElementProps();
+        // this.draggedElm.value.style.left  = "";
+        // this.draggedElm.value.style.top  = "";
+        // this.draggedElm.value.style.position = this.orgPosition.value;
     }
 
     pin(pinArea: HTMLElement) {
-        if (!this.draggedElm.value) {
-            return
+        if (!this.element_.valid) {
+            return;
         }
+        // if (!this.draggedElm.value) {
+        //     return
+        // }
 
         if (this.state.value.hoverArea != this.state.value.pinArea) {
             const unpinEvent : CbrUnpinnedEvent = {
-                element: this.draggedElm.value,
+                element: this.element_.htmlElement,
+                // element: this.draggedElm.value,
                 pinArea: this.state.value.pinArea!
             }
 
@@ -105,7 +121,8 @@ export class DraggableEngine implements CbrDraggableInterface {
 
 
         const pinEvent: CbrPinEvent = {
-            draggableElement: this.draggedElm.value,
+            draggableElement: this.element_.htmlElement,
+            // draggableElement: this.draggedElm.value,
             pinArea
         };
 
@@ -113,11 +130,13 @@ export class DraggableEngine implements CbrDraggableInterface {
             eventListener.onPin(this, pinEvent);
         });
 
-        pinArea.appendChild(this.draggedElm.value);
+        this.element_.addAsChildToElement(pinArea);
 
-        this.draggedElm.value.style.left  = "";
-        this.draggedElm.value.style.top  = "";
-        this.draggedElm.value.style.position = this.orgPosition.value;
+        // pinArea.appendChild(this.draggedElm.value);
+        //
+        // this.draggedElm.value.style.left  = "";
+        // this.draggedElm.value.style.top  = "";
+        // this.draggedElm.value.style.position = this.orgPosition.value;
 
         if (pinArea == this.props.controller.freeAreaElement) {
             this.setState({
@@ -182,18 +201,22 @@ export class DraggableEngine implements CbrDraggableInterface {
      *  called by mouse down or touch start event
      */
     onDragStart(clientX: number, clientY: number) {
-        if (!this.draggedElm.value)
+        if (!this.element_.valid) {
             return;
+        }
+        // if (!this.draggedElm.value)
+        //     return;
 
         this.forEachListener((listener) => listener.onDragStart(this));
 
 
-        this.orgPosition.value = this.draggedElm.value.style.position
-        this.draggedElm.value.style.position = 'fixed'
-        this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
-        this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
-        this.orgParent_.value = this.draggedElm.value.parentElement;
-        document.body.appendChild(this.draggedElm.value);
+        this.element_.startDragMode(clientX, clientY);
+        // this.orgPosition.value = this.draggedElm.value.style.position
+        // this.draggedElm.value.style.position = 'fixed'
+        // this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
+        // this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
+        // this.orgParent_.value = this.draggedElm.value.parentElement;
+        // document.body.appendChild(this.draggedElm.value);
         this.setState({
             state: CbrDraggableStateEnum.DRAGGING,
             hoverArea: this.state.value.pinArea,
@@ -209,19 +232,24 @@ export class DraggableEngine implements CbrDraggableInterface {
      * @param clientY
      */
     onDragMove(clientX: number, clientY: number) {
-        if (!this.draggedElm.value) {
-            return
+        if (!this.element_.valid) {
+            return;
         }
+        // if (!this.draggedElm.value) {
+        //     return
+        // }
 
-        this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
-        this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
+        this.element_.updateDragTopLeftPosition(clientX, clientY);
+        // this.draggedElm.value.style.left = `${clientX - this.draggedElm.value.clientWidth / 2}px`;
+        // this.draggedElm.value.style.top = `${clientY - this.draggedElm.value.clientHeight / 2}px`;
 
         let dropArea = this.getDropAreaFromPoint(clientX, clientY)
 
         if (dropArea !== this.state.value.hoverArea) {
             if (dropArea) {
                 const hoverEnterEvent : CbrHoverEnterEvent = {
-                    element: this.draggedElm.value,
+                    element: this.element_.htmlElement,
+                    // element: this.draggedElm.value,
                     dropArea: dropArea,
                     dropPrevented: false,
                     preventDrop: () => {
@@ -240,7 +268,8 @@ export class DraggableEngine implements CbrDraggableInterface {
             }
             else {
                 const hoverExitEvent : CbrHoverExitEvent = {
-                    element: this.draggedElm.value,
+                    element: this.element_.htmlElement,
+                    // element: this.draggedElm.value,
                     dropArea: this.state.value.hoverArea
                 };
 
@@ -262,23 +291,33 @@ export class DraggableEngine implements CbrDraggableInterface {
      *  called by mouse up or touch end event
      */
     onDragEnd() {
-        if (!this.draggedElm.value) {
-            return
+        if (!this.element_.valid) {
+            return;
         }
+        // if (!this.draggedElm.value) {
+        //     return
+        // }
 
         this.forEachListener((listener) => listener.onDragEnd(this));
 
-        if (this.state.value.hoverArea && this.draggedElm.value) {
+        if (this.state.value.hoverArea) {
             this.pin(this.state.value.hoverArea as HTMLElement);
         }
         else {
             console.log('draggable not over a drop area');
-            this.orgParent_.value.appendChild(this.draggedElm.value);
-            this.orgParent_.value = null;
-            this.props.controller?.resetElementPosition(this.draggedElm.value);
+            this.element_.restoreElementProps();
+
+            this.setState({
+                state: CbrDraggableStateEnum.PINNED,
+                pinArea: this.state.value.pinArea
+            });
+
+            // this.orgParent_.value.appendChild(this.draggedElm.value);
+            // this.orgParent_.value = null;
+            this.props.controller?.resetElementPosition(this.element_.htmlElement);
         }
 
-        this.draggedElm.value.style.position = this.orgPosition.value;
+        // this.draggedElm.value.style.position = this.orgPosition.value;
     }
 
     /**
@@ -286,9 +325,12 @@ export class DraggableEngine implements CbrDraggableInterface {
      *  called when the touch is canceled by the user
      */
     onDragCanceled() {
-        if (!this.draggedElm.value) {
-            return
+        if (!this.element_.valid) {
+            return;
         }
+        // if (!this.draggedElm.value) {
+        //     return
+        // }
 
         this.addToFreeArea();
 
@@ -296,7 +338,7 @@ export class DraggableEngine implements CbrDraggableInterface {
             state: CbrDraggableStateEnum.FREE
         });
 
-        this.draggedElm.value = null;
+        // this.draggedElm.value = null;
     }
 
     /**
@@ -411,17 +453,20 @@ export class DraggableEngine implements CbrDraggableInterface {
         if (!this.freeArea.value)
             return;
 
-        if (!this.draggedElm.value)
+        // if (!this.draggedElm.value)
+        //     return;
+        if (!this.element_.valid) {
             return;
+        }
 
         if (!this.props.controller) {
             return;
         }
 
-        let freeAreaParent = this.draggedElm.value.closest(this.props.controller.freeAreaSelector);
+        let freeAreaParent = this.element_.htmlElement.closest(this.props.controller.freeAreaSelector);
 
         if (!freeAreaParent) {
-            this.props.controller.addToFreeArea(this.draggedElm.value, this.freeArea.value as HTMLElement);
+            this.props.controller.addToFreeArea(this.element_.htmlElement, this.freeArea.value as HTMLElement);
         }
     }
 

@@ -22,7 +22,11 @@ export class CbrDraggableElement {
         });
     }
 
-    get element(): HTMLElement {
+    get valid(): boolean {
+        return this.element_ !== null;
+    }
+
+    get htmlElement(): HTMLElement {
         if (!this.element_) {
             throw new Error('HTML Element not found');
         }
