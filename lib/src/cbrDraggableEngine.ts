@@ -276,6 +276,7 @@ export class DraggableEngine implements CbrDraggableInterface {
         }
 
         this.addToFreeArea();
+        this.element_.discardElementProps();
 
         this.setState({
             state: CbrDraggableStateEnum.FREE

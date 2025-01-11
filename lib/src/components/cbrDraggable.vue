@@ -24,24 +24,11 @@
   .draggable-content {
     display: inline-block;
   }
-
-  .add-icon {
-    display: inline-block;
-    transform: translate3d(-50%, -50%, 0);
-    font-size: larger;
-    font-weight: bolder;
-  }
-
-  .remove-icon {
-    display: inline-block;
-    font-size: larger;
-    font-weight: bolder;
-  }
 </style>
 
 <script setup lang="ts">
 
-  import {onMounted, provide} from 'vue'
+  import {provide} from 'vue'
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
@@ -57,8 +44,6 @@
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESRemove());
 
   provide(draggableInjectionKey, draggableCore);
-
-  // onMounted(() => draggableCore.onMounted());
 
 
   function onMouseDown(event: MouseEvent) {
