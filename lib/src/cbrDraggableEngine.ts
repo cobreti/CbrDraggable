@@ -1,9 +1,9 @@
-import {ref, Ref, onMounted} from 'vue';
+import {ref, Ref} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
     CbrDraggableState,
-    CbrDraggableStateEnum, CbrHoverEnterEvent, CbrHoverExitEvent,
+    CbrDraggableStateEnum, CbrDraggableVuejsHooks, CbrHoverEnterEvent, CbrHoverExitEvent,
     CbrPinEvent,
     CbrUnpinnedEvent
 } from '@/cbrDragNDropTypes.js';
@@ -11,6 +11,10 @@ import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {CbrDraggableElement} from '@/cbrDraggableElement.js';
 
 export type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
+export type DraggableEngineOptions = {
+    draggableRef: Ref<HTMLElement>,
+    hooks: CbrDraggableVuejsHooks
+};
 
 export class ExternalStateSet extends Map<string, any> {}
 
@@ -28,11 +32,14 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     readonly element_: CbrDraggableElement;
 
-    constructor(private readonly props_: CbrDraggableProps, draggableRef : Ref<HTMLElement>) {
+    constructor(private readonly props_: CbrDraggableProps, options: DraggableEngineOptions) {
 
-        this.element_ = new CbrDraggableElement(draggableRef);
+        this.element_ = new CbrDraggableElement({
+                draggableRef: options.draggableRef,
+                hooks: options.hooks
+            });
 
-        onMounted( () => {
+        options.hooks.onMounted( () => {
             this.freeArea.value = this.props.controller.freeAreaElement;
             this.props.controller?.registerDraggable(this);
 

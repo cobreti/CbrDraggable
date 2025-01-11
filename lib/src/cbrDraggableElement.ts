@@ -1,4 +1,5 @@
-import {onMounted, Ref} from 'vue';
+import {Ref} from 'vue';
+import {CbrDraggableVuejsHooks} from '@/cbrDragNDropTypes.js';
 
 type CbrDraggableElementProps = {
     position: string,
@@ -7,16 +8,20 @@ type CbrDraggableElementProps = {
     parent: HTMLElement
 }
 
+export type CbrDraggableElementOptions = {
+    draggableRef: Ref<HTMLElement>,
+    hooks: CbrDraggableVuejsHooks
+}
+
 export class CbrDraggableElement {
 
     element_: HTMLElement | null = null;
 
     readonly SavedProps_ : CbrDraggableElementProps[] = [];
 
-    constructor(draggableRef: Ref<HTMLElement>) {
-        onMounted(() => {
-            console.log('CbrDraggableElement.onMounted');
-            this.element_ = draggableRef.value;
+    constructor(options: CbrDraggableElementOptions) {
+        options.hooks.onMounted(() => {
+            this.element_ = options.draggableRef.value;
         });
     }
 

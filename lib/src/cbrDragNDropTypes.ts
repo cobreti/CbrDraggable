@@ -42,3 +42,6 @@ export type CbrDraggableProps = {
   eventListener?: CbrDraggableEventsListenerInterface
 };
 
+export type CbrDraggableVuejsHooks = {
+  onMounted: (callback: () => void) => void,
+}
