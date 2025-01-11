@@ -1,4 +1,4 @@
-import {ref, Ref, useTemplateRef, onMounted} from 'vue';
+import {ref, Ref, onMounted} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
@@ -28,9 +28,9 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     readonly element_: CbrDraggableElement;
 
-    constructor(private readonly props_: CbrDraggableProps, divRefName = 'draggableContent') {
+    constructor(private readonly props_: CbrDraggableProps, draggableRef : Ref<HTMLElement>) {
 
-        this.element_ = new CbrDraggableElement(divRefName);
+        this.element_ = new CbrDraggableElement(draggableRef);
 
         onMounted( () => {
             this.freeArea.value = this.props.controller.freeAreaElement;

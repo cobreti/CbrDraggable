@@ -28,7 +28,7 @@
 
 <script setup lang="ts">
 
-  import {provide} from 'vue'
+import {provide, useTemplateRef} from 'vue'
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
@@ -39,7 +39,7 @@
 
   const props = defineProps<CbrDraggableProps>();
 
-  const draggableCore : DraggableEngine = new DraggableEngine(props);
+  const draggableCore : DraggableEngine = new DraggableEngine(props, useTemplateRef<HTMLElement>('draggableContent'));
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESAdd());
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESRemove());
 

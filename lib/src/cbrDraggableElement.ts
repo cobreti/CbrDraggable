@@ -1,4 +1,4 @@
-import {onMounted, useTemplateRef} from 'vue';
+import {onMounted, Ref} from 'vue';
 
 type CbrDraggableElementProps = {
     position: string,
@@ -13,9 +13,7 @@ export class CbrDraggableElement {
 
     readonly SavedProps_ : CbrDraggableElementProps[] = [];
 
-    constructor(divRefName: string) {
-        const draggableRef = useTemplateRef<HTMLElement>(divRefName);
-
+    constructor(draggableRef: Ref<HTMLElement>) {
         onMounted(() => {
             console.log('CbrDraggableElement.onMounted');
             this.element_ = draggableRef.value;
