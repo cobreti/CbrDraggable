@@ -66,7 +66,7 @@ describe('cbrDraggableElement', () => {
     test('valid element', () => {
       const draggableElement = new CbrDraggableElement(options);
 
-      const savePropsSpy = vi.spyOn(draggableElement, 'saveElementProps');
+      const savePropsSpy = vi.spyOn(draggableElement, 'saveProps');
 
       draggableElement.startDragMode(0, 0);
 
@@ -85,7 +85,7 @@ describe('cbrDraggableElement', () => {
       const options = {draggableRef, hooks};
       const draggableElement = new CbrDraggableElement(options);
 
-      const savePropsSpy = vi.spyOn(draggableElement, 'saveElementProps');
+      const savePropsSpy = vi.spyOn(draggableElement, 'saveProps');
 
       draggableElement.startDragMode(0, 0);
 
@@ -104,6 +104,87 @@ describe('cbrDraggableElement', () => {
 
       expect(draggableElement.htmlElement.style.left).toBe('50px');
       expect(draggableElement.htmlElement.style.top).toBe('90px');
+    });
+
+  });
+
+  describe('restoreElementProps', () => {
+
+    test('valid element', () => {
+      const draggableElement = new CbrDraggableElement(options);
+
+      const props = {
+        position: 'fixed',
+        left: '0px',
+        top: '0px',
+        parent: jsdom.window.document.querySelector('body')
+      };
+
+      draggableElement.savedProps_.push(props);
+
+      draggableElement.restoreSavedProps();
+
+      const parent = draggableElement.element_.parentElement;
+
+      expect(draggableElement.htmlElement.style.position).toBe(props.position);
+      expect(draggableElement.htmlElement.style.left).toBe(props.left);
+      expect(draggableElement.htmlElement.style.top).toBe(props.top);
+      expect(parent).toBe(props.parent);
+    });
+  });
+
+  describe('addAsChildToElement', () => {
+
+    test('no saved props', () => {
+      const draggableElement = new CbrDraggableElement(options);
+
+      const parent = jsdom.window.document.createElement('div');
+      draggableElement.addAsChildToElement(parent);
+
+      expect(draggableElement.htmlElement.parentElement).toBe(parent);
+    });
+
+    test('with saved props', () => {
+      const draggableElement = new CbrDraggableElement(options);
+
+      const props = {
+        position: 'fixed',
+        left: '10px',
+        top: '20px',
+        parent: jsdom.window.document.querySelector('body')
+      };
+
+      draggableElement.savedProps_.push(props);
+
+      const parent = jsdom.window.document.createElement('div');
+      draggableElement.addAsChildToElement(parent);
+
+      const htmlElement = draggableElement.htmlElement;
+
+      expect(htmlElement.parentElement).toBe(parent);
+      expect(htmlElement.style.position).toBe('fixed');
+      expect(htmlElement.style.left).toBe('10px');
+      expect(htmlElement.style.top).toBe('20px');
+    });
+  });
+
+  describe('discardElementSavedProps', () => {
+
+    test('valid element', () => {
+      const draggableElement = new CbrDraggableElement(options);
+
+      const props = {
+        position: 'fixed',
+        left: '0px',
+        top: '0px',
+        parent: jsdom.window.document.querySelector('body')
+      };
+
+      draggableElement.savedProps_.push(props);
+
+      draggableElement.discardSavedProps();
+
+      expect(draggableElement.savedProps_.length).toBe(0);
     });
 
   });

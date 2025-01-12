@@ -82,7 +82,7 @@ export class DraggableEngine implements CbrDraggableInterface {
             state: CbrDraggableStateEnum.FREE
         });
 
-        this.element_.restoreElementProps();
+        this.element_.restoreSavedProps();
     }
 
     pin(pinArea: HTMLElement) {
@@ -262,7 +262,7 @@ export class DraggableEngine implements CbrDraggableInterface {
         }
         else {
             console.log('draggable not over a drop area');
-            this.element_.restoreElementProps();
+            this.element_.restoreSavedProps();
 
             this.setState({
                 state: CbrDraggableStateEnum.PINNED,
@@ -283,7 +283,7 @@ export class DraggableEngine implements CbrDraggableInterface {
         }
 
         this.addToFreeArea();
-        this.element_.discardElementProps();
+        this.element_.discardSavedProps();
 
         this.setState({
             state: CbrDraggableStateEnum.FREE

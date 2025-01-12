@@ -17,7 +17,7 @@ export class CbrDraggableElement {
 
     element_: HTMLElement | null = null;
 
-    readonly SavedProps_ : CbrDraggableElementProps[] = [];
+    readonly savedProps_ : CbrDraggableElementProps[] = [];
 
     constructor(options: CbrDraggableElementOptions) {
         options.hooks.onMounted(() => {
@@ -39,7 +39,7 @@ export class CbrDraggableElement {
 
     startDragMode(clientX: number, clientY: number): void {
         if (this.element_) {
-            this.saveElementProps();
+            this.saveProps();
 
             this.element_.style.position = 'fixed'
             this.element_.style.left = `${clientX - this.element_.clientWidth / 2}px`;
@@ -55,9 +55,9 @@ export class CbrDraggableElement {
         }
     }
 
-    saveElementProps(): void {
+    saveProps(): void {
         if (this.element_) {
-            this.SavedProps_.push({
+            this.savedProps_.push({
                 position: this.element_.style.position,
                 left: this.element_.style.left,
                 top: this.element_.style.top,
@@ -66,9 +66,9 @@ export class CbrDraggableElement {
         }
     }
 
-    restoreElementProps(): void {
+    restoreSavedProps(): void {
         if (this.element_) {
-            const props = this.SavedProps_.pop();
+            const props = this.savedProps_.pop();
             if (props) {
                 this.element_.style.position = props.position;
                 this.element_.style.left = props.left;
@@ -80,15 +80,18 @@ export class CbrDraggableElement {
 
     addAsChildToElement(parent: HTMLElement): void {
         if (this.element_) {
-            const props = this.SavedProps_.pop();
-            this.element_.style.position = props.position;
-            this.element_.style.left = props.left;
-            this.element_.style.top = props.top;
+
+            if (this.savedProps_.length > 0) {
+                const props = this.savedProps_.pop();
+                this.element_.style.position = props.position;
+                this.element_.style.left = props.left;
+                this.element_.style.top = props.top;
+            }
             parent.appendChild(this.element_);
         }
     }
 
-    discardElementProps(): void {
-        this.SavedProps_.pop();
+    discardSavedProps(): void {
+        this.savedProps_.pop();
     }
 }
