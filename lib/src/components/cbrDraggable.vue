@@ -32,18 +32,19 @@ import {onMounted, provide, useTemplateRef} from 'vue'
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
-  import {DraggableEngine} from '@/cbrDraggableEngine.js';
+import {CbrDraggableElementFactory, CbrDraggableEngine} from '@/cbrDraggableEngine.js';
   import {draggableInjectionKey} from '@/keys.js';
   import {CbrDraggableEventsListener_ESAdd} from '@/eventsListeners/cbrDraggableEventsListener_ESAdd.js';
   import {CbrDraggableEventsListener_ESRemove} from '@/eventsListeners/cbrDraggableEventsListener_ESRemove.js';
 
   const props = defineProps<CbrDraggableProps>();
 
-  const draggableCore : DraggableEngine = new DraggableEngine(props, {
+  const draggableCore : CbrDraggableEngine = new CbrDraggableEngine(props, {
       draggableRef: useTemplateRef('draggableContent'),
       hooks: {
         onMounted
-      }
+      },
+      draggableElementFactory: CbrDraggableElementFactory
     });
 
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESAdd());

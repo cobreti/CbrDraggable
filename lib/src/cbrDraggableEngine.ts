@@ -8,17 +8,22 @@ import {
     CbrUnpinnedEvent
 } from '@/cbrDragNDropTypes.js';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
-import {CbrDraggableElement} from '@/cbrDraggableElement.js';
+import {CbrDraggableElement, CbrDraggableElementOptions} from '@/cbrDraggableElement.js';
 
 export type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
 export type DraggableEngineOptions = {
     draggableRef: Ref<HTMLElement>,
-    hooks: CbrDraggableVuejsHooks
+    hooks: CbrDraggableVuejsHooks,
+    draggableElementFactory: (options: CbrDraggableElementOptions) => CbrDraggableElement
 };
+
+export const CbrDraggableElementFactory: (options: CbrDraggableElementOptions) => CbrDraggableElement = (options: CbrDraggableElementOptions) => {
+    return new CbrDraggableElement(options);
+}
 
 export class ExternalStateSet extends Map<string, any> {}
 
-export class DraggableEngine implements CbrDraggableInterface {
+export class CbrDraggableEngine implements CbrDraggableInterface {
 
     readonly eventListeners_: EventListenersInterfacesTable = new Set();
 
@@ -34,7 +39,7 @@ export class DraggableEngine implements CbrDraggableInterface {
 
     constructor(private readonly props_: CbrDraggableProps, options: DraggableEngineOptions) {
 
-        this.element_ = new CbrDraggableElement({
+        this.element_ = options.draggableElementFactory({
                 draggableRef: options.draggableRef,
                 hooks: options.hooks
             });
@@ -42,6 +47,9 @@ export class DraggableEngine implements CbrDraggableInterface {
         options.hooks.onMounted( () => {
             this.freeArea.value = this.props.controller.freeAreaElement;
             this.props.controller?.registerDraggable(this);
+            if (this.props_.eventListener) {
+                this.eventListeners_.add(this.props_.eventListener);
+            }
 
             this.forEachListener((eventListener) => {
                 eventListener.onStateChanged(this, this.state.value);
