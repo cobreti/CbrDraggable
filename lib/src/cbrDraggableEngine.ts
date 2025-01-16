@@ -64,10 +64,10 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
 
     get freeArea() : Ref<HTMLElement | null> { return this.freeArea_ }
 
-    get pinArea(): HTMLElement | null { return this.state.value.pinArea }
-    get hoverArea(): HTMLElement | null { return this.state.value.hoverArea }
-    get element(): HTMLElement { return this.element_.htmlElement; }
-    get controller(): CbrDraggableControllerInterface | null { return this.props_.controller }
+    get pinArea(): HTMLElement | undefined { return this.state.value.pinArea }
+    get hoverArea(): HTMLElement | undefined { return this.state.value.hoverArea }
+    get element(): HTMLElement | undefined { return this.element_.htmlElement; }
+    get controller(): CbrDraggableControllerInterface | undefined { return this.props_.controller }
 
     unpin() {
         if (!this.element_.valid) {

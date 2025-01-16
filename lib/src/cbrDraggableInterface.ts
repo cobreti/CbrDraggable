@@ -18,10 +18,10 @@ export interface CbrDraggableEventsListenerInterface {
 
 export interface CbrDraggableInterface {
     readonly id: string;
-    readonly pinArea: HTMLElement | null;
-    readonly hoverArea: HTMLElement | null;
-    readonly element: HTMLElement | null;
-    readonly controller: CbrDraggableControllerInterface | null;
+    readonly pinArea: HTMLElement | undefined;
+    readonly hoverArea: HTMLElement | undefined;
+    readonly element: HTMLElement | undefined;
+    readonly controller: CbrDraggableControllerInterface | undefined;
 
     unpin() : void;
     pin(pinArea: HTMLElement):void;
