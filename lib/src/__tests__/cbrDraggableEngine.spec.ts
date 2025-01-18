@@ -1,11 +1,11 @@
-import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
-import {CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum, CbrUnpinnedEvent} from '@/cbrDragNDropTypes.ts';
-import {JSDOM} from 'jsdom';
-import {Ref, ref} from 'vue';
-import {CbrDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.ts';
-import {CbrDraggableController, CbrDraggableControllerOptions} from '@/cbrDraggableController.ts';
-import {CbrDraggableElement, CbrDraggableElementOptions} from '@/cbrDraggableElement.js';
-import {CbrDraggableEventsListenerInterface, type CbrDraggableInterface} from '@/cbrDraggableInterface.js';
+import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
+import { CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
+import { JSDOM } from 'jsdom';
+import { Ref, ref } from 'vue';
+import { CbrDraggableEngine, DraggableEngineOptions } from '@/cbrDraggableEngine.ts';
+import { CbrDraggableController, CbrDraggableControllerOptions } from '@/cbrDraggableController.ts';
+import { CbrDraggableElement, CbrDraggableElementOptions } from '@/cbrDraggableElement.js';
+import { CbrDraggableEventsListenerInterface, type CbrDraggableInterface } from '@/cbrDraggableInterface.js';
 
 declare namespace global {
   let document: Document;
@@ -26,24 +26,24 @@ describe('cbrDraggableEngine', () => {
 
 
   const draggableId = 'drag1';
-  const draggableRef : Ref<HTMLElement> = ref<HTMLElement>(jsdom.window.document.querySelector('#draggable-item'));
-  const controllerOptions : CbrDraggableControllerOptions = {
+  const draggableRef: Ref<HTMLElement> = ref<HTMLElement>(jsdom.window.document.querySelector('#draggable-item'));
+  const controllerOptions: CbrDraggableControllerOptions = {
     pinAreaSelector: '.pin-area',
     freeAreaSelector: '.free-area'
   }
-  let controller : CbrDraggableController;
+  let controller: CbrDraggableController;
 
-  function onMounted(callback: () => void) : void {
+  function onMounted(callback: () => void): void {
     callback();
   }
 
   const draggableElementMock = {
-    get htmlElement() : HTMLElement { return draggableRef.value; },
-    get valid() : boolean { return true; },
-    restoreSavedProps(): void {}
+    get htmlElement(): HTMLElement { return draggableRef.value; },
+    get valid(): boolean { return true; },
+    restoreSavedProps(): void { }
   } as CbrDraggableElement;
 
-  const options : DraggableEngineOptions = {
+  const options: DraggableEngineOptions = {
     draggableRef,
     hooks: {
       onMounted
@@ -73,7 +73,7 @@ describe('cbrDraggableEngine', () => {
 
     test('no listeners', () => {
 
-      const registerDraggableSpy = vi.spyOn(controller, 'registerDraggable').mockImplementation(() => {});
+      const registerDraggableSpy = vi.spyOn(controller, 'registerDraggable').mockImplementation(() => { });
       const mountedSpy = vi.spyOn(options.hooks, 'onMounted');
 
       const draggableEngine = new CbrDraggableEngine(props, options);
@@ -82,7 +82,7 @@ describe('cbrDraggableEngine', () => {
       expect(registerDraggableSpy).toHaveBeenCalledTimes(1);
       expect(mountedSpy).toHaveBeenCalledTimes(1);
       expect(draggableEngine.freeArea_.value).toBe(jsdom.window.document.querySelector('.free-area'));
-      expect(draggableEngine.state_.value).toEqual( { state: CbrDraggableStateEnum.FREE });
+      expect(draggableEngine.state_.value).toEqual({ state: CbrDraggableStateEnum.FREE });
       expect(draggableEngine.id).toBe(draggableId);
       expect(draggableEngine.pinArea).toBeUndefined();
       expect(draggableEngine.hoverArea).toBeUndefined();
@@ -93,10 +93,10 @@ describe('cbrDraggableEngine', () => {
     test('listener presents', () => {
 
       const listener = {
-        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void {}
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
       } as CbrDraggableEventsListenerInterface;
 
-      const registerDraggableSpy = vi.spyOn(controller, 'registerDraggable').mockImplementation(() => {});
+      const registerDraggableSpy = vi.spyOn(controller, 'registerDraggable').mockImplementation(() => { });
       const mountedSpy = vi.spyOn(options.hooks, 'onMounted');
       const localProps = { ...props, eventListener: listener };
       const listenerSpy = vi.spyOn(listener, 'onStateChanged');
@@ -107,7 +107,7 @@ describe('cbrDraggableEngine', () => {
       expect(registerDraggableSpy).toHaveBeenCalledTimes(1);
       expect(mountedSpy).toHaveBeenCalledTimes(1);
       expect(draggableEngine.freeArea_.value).toBe(jsdom.window.document.querySelector('.free-area'));
-      expect(draggableEngine.state_.value).toEqual( { state: CbrDraggableStateEnum.FREE });
+      expect(draggableEngine.state_.value).toEqual({ state: CbrDraggableStateEnum.FREE });
       expect(draggableEngine.id).toBe(draggableId);
       expect(draggableEngine.pinArea).toBeUndefined();
       expect(draggableEngine.hoverArea).toBeUndefined();
@@ -124,8 +124,8 @@ describe('cbrDraggableEngine', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);
 
       const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get').mockReturnValue(false);
-      const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea').mockImplementation(() => {});
-      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => {});
+      const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea').mockImplementation(() => { });
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => { });
 
       draggableEngine.unpin();
 
@@ -141,11 +141,11 @@ describe('cbrDraggableEngine', () => {
       };
 
       const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
       const setStateSpy = vi.spyOn(draggableEngine, 'setState')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
       const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
 
       draggableEngine.unpin();
 
@@ -181,11 +181,11 @@ describe('cbrDraggableEngine', () => {
       draggableEngine.state.value.pinArea = jsdom.window.document.querySelector('.pin-area');
 
       const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
       const setStateSpy = vi.spyOn(draggableEngine, 'setState')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
       const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
-          .mockImplementation(() => {});
+        .mockImplementation(() => { });
       const forEachListenerSpy = vi.spyOn(draggableEngine, 'forEachListener');
       const onUnpinSpy = vi.spyOn(listener, 'onUnpin');
 
@@ -199,6 +199,36 @@ describe('cbrDraggableEngine', () => {
       expect(forEachListenerSpy).toHaveBeenCalled();
       expect(onUnpinSpy).toHaveBeenCalled();
       expect(receivedEvent).toEqual(unpinEvent);
+    });
+  });
+
+  describe('setState', () => {
+
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const eventListener = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void {
+          stateReceived = state;
+         }
+      } as CbrDraggableEventsListenerInterface;
+
+      let stateReceived : CbrDraggableState | undefined;
+
+      const newState = {
+        state: CbrDraggableStateEnum.DRAGGING,
+        pinArea: jsdom.window.document.querySelector('.pin-area'),
+        hoverArea: jsdom.window.document.querySelector('.free-area')
+      } as CbrDraggableState;
+
+      const forEachListenerSpy = vi.spyOn(draggableEngine, 'forEachListener');
+
+      draggableEngine.addEventListener(eventListener);
+      draggableEngine.setState(newState);
+
+      expect(stateReceived).toEqual(newState);
+      expect(draggableEngine.state.value).toEqual(newState);
+      expect(forEachListenerSpy).toHaveBeenCalled();
     });
   });
 });
