@@ -1,5 +1,5 @@
 import {afterEach, beforeEach, describe, expect, test, vi} from 'vitest';
-import {CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum} from '@/cbrDragNDropTypes.ts';
+import {CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum, CbrUnpinnedEvent} from '@/cbrDragNDropTypes.ts';
 import {JSDOM} from 'jsdom';
 import {Ref, ref} from 'vue';
 import {CbrDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.ts';
@@ -38,6 +38,7 @@ describe('cbrDraggableEngine', () => {
   }
 
   const draggableElementMock = {
+    get htmlElement() : HTMLElement { return draggableRef.value; },
     get valid() : boolean { return true; },
     restoreSavedProps(): void {}
   } as CbrDraggableElement;
@@ -139,16 +140,65 @@ describe('cbrDraggableEngine', () => {
         state: CbrDraggableStateEnum.DRAGGING
       };
 
-      const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea').mockImplementation(() => {});
-      const setStateSpy = vi.spyOn(draggableEngine, 'setState');
-      const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps').mockImplementation(() => {});
+      const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea')
+          .mockImplementation(() => {});
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState')
+          .mockImplementation(() => {});
+      const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
+          .mockImplementation(() => {});
 
       draggableEngine.unpin();
 
       expect(addToFreeAreaSpy).toHaveBeenCalled();
-      expect(setStateSpy).toHaveBeenCalled();
+      expect(setStateSpy).toHaveBeenCalledWith({
+        state: CbrDraggableStateEnum.FREE
+      });
       expect(restoreSavedPropsSpy).toHaveBeenCalled();
-      expect(draggableEngine.state.value.state).toBe(CbrDraggableStateEnum.FREE);
+    });
+
+    test('pin area', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
+          receivedEvent = event;
+        }
+      } as CbrDraggableEventsListenerInterface;
+
+      const unpinEvent = {
+        element: draggableRef.value,
+        pinArea: jsdom.window.document.querySelector('.pin-area')
+      };
+
+      let receivedEvent: CbrUnpinnedEvent | undefined;
+
+      draggableEngine.addEventListener(listener);
+
+      draggableEngine.state.value = {
+        state: CbrDraggableStateEnum.DRAGGING
+      };
+
+      draggableEngine.state.value.pinArea = jsdom.window.document.querySelector('.pin-area');
+
+      const addToFreeAreaSpy = vi.spyOn(draggableEngine, 'addToFreeArea')
+          .mockImplementation(() => {});
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState')
+          .mockImplementation(() => {});
+      const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
+          .mockImplementation(() => {});
+      const forEachListenerSpy = vi.spyOn(draggableEngine, 'forEachListener');
+      const onUnpinSpy = vi.spyOn(listener, 'onUnpin');
+
+      draggableEngine.unpin();
+
+      expect(addToFreeAreaSpy).toHaveBeenCalled();
+      expect(setStateSpy).toHaveBeenCalledWith({
+        state: CbrDraggableStateEnum.FREE
+      })
+      expect(restoreSavedPropsSpy).toHaveBeenCalled();
+      expect(forEachListenerSpy).toHaveBeenCalled();
+      expect(onUnpinSpy).toHaveBeenCalled();
+      expect(receivedEvent).toEqual(unpinEvent);
     });
   });
 });
