@@ -428,4 +428,90 @@ describe('cbrDraggableEngine', () => {
         expect(receivedValue).toBeUndefined();
       })
   });
+
+  describe('addEventListener', () => {
+
+    test('success path', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      expect(draggable.eventListeners_.size).toBe(0);
+
+      draggable.addEventListener(listener);
+
+      expect(draggable.eventListeners_.size).toBe(1);
+      expect(Array.from(draggable.eventListeners_)).toEqual([listener]);
+    });
+  });
+
+  describe('removeEventListener', () => {
+
+    test('single listener', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      draggable.addEventListener(listener);
+
+      expect(draggable.eventListeners_.size).toBe(1);
+
+      draggable.removeEventListener(listener);
+
+      expect(draggable.eventListeners_.size).toBe(0);
+    });
+
+    test('multiple listeners', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+
+      const listener1 = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      const listener2 = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      draggable.addEventListener(listener1);
+      draggable.addEventListener(listener2);
+
+      expect(draggable.eventListeners_.size).toBe(2);
+
+      draggable.removeEventListener(listener1);
+
+      expect(draggable.eventListeners_.size).toBe(1);
+      expect(Array.from(draggable.eventListeners_)).toEqual([listener2]);
+    });
+  });
+
+  describe('forEachListener', () => {
+    test('multiple listeners get all called', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+
+      const listener1 = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      const listener2 = {
+        onStateChanged(draggable: CbrDraggableInterface, state: CbrDraggableState): void { }
+      } as CbrDraggableEventsListenerInterface;
+
+      const listener1Spy = vi.spyOn(listener1, 'onStateChanged');
+      const listener2Spy = vi.spyOn(listener2, 'onStateChanged');
+
+      draggable.addEventListener(listener1);
+      draggable.addEventListener(listener2);
+
+      draggable.forEachListener((listener: CbrDraggableEventsListenerInterface) => {
+        listener.onStateChanged(draggable, draggable.state.value);
+      });
+
+      expect(listener1Spy).toHaveBeenCalled();
+      expect(listener2Spy).toHaveBeenCalled();
+    });
+  });
 });

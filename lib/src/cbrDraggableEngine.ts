@@ -10,7 +10,8 @@ import {
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {CbrDraggableElement, CbrDraggableElementOptions} from '@/cbrDraggableElement.js';
 
-export type EventListenersInterfacesTable = Set<CbrDraggableEventsListenerInterface>;
+export class EventListenersInterfacesTable extends Set<CbrDraggableEventsListenerInterface> {}
+
 export type DraggableEngineOptions = {
     draggableRef: Ref<HTMLElement>,
     hooks: CbrDraggableVuejsHooks,
@@ -25,7 +26,7 @@ export class ExternalStateSet extends Map<string, any> {}
 
 export class CbrDraggableEngine implements CbrDraggableInterface {
 
-    readonly eventListeners_: EventListenersInterfacesTable = new Set();
+    readonly eventListeners_: EventListenersInterfacesTable = new EventListenersInterfacesTable();
 
     readonly state_: Ref<CbrDraggableState> = ref({
         state: CbrDraggableStateEnum.FREE
