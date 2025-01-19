@@ -148,10 +148,12 @@ describe('cbrDraggableEngine', () => {
         .mockImplementation(() => { });
       const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
         .mockImplementation(() => { });
+      const dispatchUnpinnedEventSpy = vi.spyOn(draggableEngine, 'dispatchUnpinnedEvent');
 
       draggableEngine.unpin();
 
       expect(addToFreeAreaSpy).toHaveBeenCalled();
+      expect(dispatchUnpinnedEventSpy).not.toHaveBeenCalled();
       expect(setStateSpy).toHaveBeenCalledWith({
         state: CbrDraggableStateEnum.FREE
       });
@@ -161,20 +163,12 @@ describe('cbrDraggableEngine', () => {
     test('pin area', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);
 
-      const listener = {
-        onUnpin(draggable: CbrDraggableInterface, event: CbrUnpinnedEvent): void {
-          receivedEvent = event;
-        }
-      } as CbrDraggableEventsListenerInterface;
-
       const unpinEvent = {
         element: draggableRef.value,
         pinArea: jsdom.window.document.querySelector('.pin-area')
       };
 
       let receivedEvent: CbrUnpinnedEvent | undefined;
-
-      draggableEngine.addEventListener(listener);
 
       draggableEngine.state.value = {
         state: CbrDraggableStateEnum.DRAGGING
@@ -188,8 +182,8 @@ describe('cbrDraggableEngine', () => {
         .mockImplementation(() => { });
       const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps')
         .mockImplementation(() => { });
-      const forEachListenerSpy = vi.spyOn(draggableEngine, 'forEachListener');
-      const onUnpinSpy = vi.spyOn(listener, 'onUnpin');
+      const dispatchUnpinnedEventSpy = vi.spyOn(draggableEngine, 'dispatchUnpinnedEvent')
+          .mockImplementation((event: CbrUnpinnedEvent) => {receivedEvent = event;});
 
       draggableEngine.unpin();
 
@@ -198,8 +192,7 @@ describe('cbrDraggableEngine', () => {
         state: CbrDraggableStateEnum.FREE
       })
       expect(restoreSavedPropsSpy).toHaveBeenCalled();
-      expect(forEachListenerSpy).toHaveBeenCalled();
-      expect(onUnpinSpy).toHaveBeenCalled();
+      expect(dispatchUnpinnedEventSpy).toHaveBeenCalled();
       expect(receivedEvent).toEqual(unpinEvent);
     });
   });

@@ -51,9 +51,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
                 this.eventListeners_.add(this.props_.eventListener);
             }
 
-            this.forEachListener((eventListener) => {
-                eventListener.onStateChanged(this, this.state.value);
-            });
+            this.dispatchStateChanged(this.state.value);
         });
     }
 
@@ -75,14 +73,10 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         }
 
         if (this.state.value.pinArea) {
-            const unpinEvent : CbrUnpinnedEvent = {
+            this.dispatchUnpinnedEvent({
                 element: this.element_.htmlElement,
                 pinArea: this.state.value.pinArea!
-            }
-
-            this.forEachListener((eventListener) => {
-                eventListener.onUnpin(this, unpinEvent);
-            });
+            })
         }
 
         this.addToFreeArea();
@@ -172,6 +166,12 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
      */
     getDropAreaFromPoint(x: number, y: number): HTMLElement | undefined {
         return this.props.controller.getDropAreaFromPoint(x, y);
+    }
+
+    dispatchStateChanged(newState: CbrDraggableState) {
+        this.forEachListener((eventListener) => {
+            eventListener.onStateChanged(this, newState);
+        });
     }
 
     dispatchPinEvent(event: CbrPinEvent) {
