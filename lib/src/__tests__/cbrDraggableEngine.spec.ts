@@ -326,4 +326,106 @@ describe('cbrDraggableEngine', () => {
       expect(forEachListenerSpy).toHaveBeenCalled();
     });
   });
+
+  describe('updateStateAfterPin', () => {
+
+    test('pin area is free area', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+      draggable.state.value.state = CbrDraggableStateEnum.DRAGGING;
+
+      const pinArea = jsdom.window.document.querySelector('.free-area') as HTMLElement;
+
+      let newStateReceived : CbrDraggableState | undefined;
+
+      const setStateSpy = vi.spyOn(draggable, 'setState').mockImplementation(() => { })
+          .mockImplementation((newState: CbrDraggableState) => { newStateReceived = newState; });
+
+      draggable.updateStateAfterPin(pinArea);
+
+      expect(setStateSpy).toHaveBeenCalled();
+      expect(newStateReceived).not.toBeUndefined();
+      expect(newStateReceived?.state).toBe(CbrDraggableStateEnum.FREE);
+    });
+
+    test('pin area different free area', () => {
+      const draggable = new CbrDraggableEngine(props, options);
+      draggable.state.value.state = CbrDraggableStateEnum.DRAGGING;
+
+      const pinArea = jsdom.window.document.querySelector('.pin-area') as HTMLElement;
+
+      let newStateReceived : CbrDraggableState | undefined;
+
+      const setStateSpy = vi.spyOn(draggable, 'setState').mockImplementation(() => { })
+          .mockImplementation((newState: CbrDraggableState) => { newStateReceived = newState; });
+
+      draggable.updateStateAfterPin(pinArea);
+
+      expect(setStateSpy).toHaveBeenCalled();
+      expect(newStateReceived).not.toBeUndefined();
+      expect(newStateReceived?.state).toBe(CbrDraggableStateEnum.PINNED);
+    });
+
+  });
+
+  describe('updateExternalState', () => {
+
+    test('success path', () => {
+      const externalState = 'external state';
+      const value = 'new value';
+
+      const receivedValues = {
+        oldValue: undefined,
+        newValue: undefined,
+        externalState: undefined
+      };
+
+      const draggable = new CbrDraggableEngine(props, options);
+
+      const dispatchExternalStateChangedSpy = vi.spyOn(draggable, 'dispatchExternalStateChanged')
+          .mockImplementation((externalState: string, oldValue: any, newValue: any) => {
+            receivedValues.externalState = externalState;
+            receivedValues.oldValue = oldValue;
+            receivedValues.newValue = newValue;
+          });
+
+      const stateOldValue = draggable.externalStates_.get(externalState);
+
+      draggable.updateExternalState(externalState, value);
+
+      const stateNewValue = draggable.externalStates_.get(externalState);
+
+      expect(dispatchExternalStateChangedSpy).toHaveBeenCalled();
+      expect(receivedValues.externalState).toBe(externalState);
+      expect(receivedValues.oldValue).toBeUndefined();
+      expect(receivedValues.newValue).toBe(value);
+      expect(stateOldValue).toBeUndefined();
+      expect(stateNewValue).toBe(value);
+    });
+  });
+
+  describe('getExternalState', () => {
+
+      test('success path', () => {
+        const externalState = 'external state';
+        const value = 'new value';
+
+        const draggable = new CbrDraggableEngine(props, options);
+
+        draggable.externalStates_.set(externalState, value);
+
+        const receivedValue = draggable.getExternalState(externalState);
+
+        expect(receivedValue).toBe(value);
+      });
+
+      test('no state value', () => {
+        const externalState = 'external state';
+
+        const draggable = new CbrDraggableEngine(props, options);
+
+        const receivedValue = draggable.getExternalState(externalState);
+
+        expect(receivedValue).toBeUndefined();
+      })
+  });
 });

@@ -138,9 +138,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         const oldValue = this.externalStates_.get(externalState);
         this.externalStates_.set(externalState, value);
 
-        this.forEachListener((eventListener) => {
-            eventListener.onExternalStateChanged(this, externalState, oldValue, value);
-        });
+        this.dispatchExternalStateChanged(externalState, oldValue, value);
     }
 
     getExternalState(externalState: string): any {
@@ -183,6 +181,12 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
     dispatchUnpinnedEvent(event: CbrUnpinnedEvent) {
         this.forEachListener((eventListener) => {
             eventListener.onUnpin(this, event);
+        });
+    }
+
+    dispatchExternalStateChanged(externalState: string, oldValue: any, newValue: any) {
+        this.forEachListener((eventListener) => {
+            eventListener.onExternalStateChanged(this, externalState, oldValue, newValue);
         });
     }
 
