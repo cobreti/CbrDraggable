@@ -99,28 +99,23 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         }
 
         if (this.state.value.hoverArea != this.state.value.pinArea) {
-            const unpinEvent : CbrUnpinnedEvent = {
+            this.dispatchUnpinnedEvent({
                 element: this.element_.htmlElement,
                 pinArea: this.state.value.pinArea!
-            }
-
-            this.forEachListener((eventListener) => {
-                eventListener.onUnpin(this, unpinEvent);
             });
         }
 
-
-        const pinEvent: CbrPinEvent = {
+        this.dispatchPinEvent({
             draggableElement: this.element_.htmlElement,
             pinArea
-        };
-
-        this.forEachListener((eventListener) => {
-            eventListener.onPin(this, pinEvent);
         });
 
         this.element_.addAsChildToElement(pinArea);
 
+        this.updateStateAfterPin(pinArea);
+    }
+
+    updateStateAfterPin(pinArea: HTMLElement) {
         if (pinArea == this.props.controller.freeAreaElement) {
             this.setState({
                 state: CbrDraggableStateEnum.FREE
@@ -177,6 +172,18 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
      */
     getDropAreaFromPoint(x: number, y: number): HTMLElement | undefined {
         return this.props.controller.getDropAreaFromPoint(x, y);
+    }
+
+    dispatchPinEvent(event: CbrPinEvent) {
+        this.forEachListener((eventListener) => {
+            eventListener.onPin(this, event);
+        });
+    }
+
+    dispatchUnpinnedEvent(event: CbrUnpinnedEvent) {
+        this.forEachListener((eventListener) => {
+            eventListener.onUnpin(this, event);
+        });
     }
 
     /**

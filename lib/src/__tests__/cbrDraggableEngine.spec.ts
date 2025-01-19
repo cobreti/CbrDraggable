@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
-import { CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
+import { CbrDraggableProps, CbrDraggableState, CbrDraggableStateEnum, CbrPinEvent, CbrUnpinnedEvent } from '@/cbrDragNDropTypes.ts';
 import { JSDOM } from 'jsdom';
 import { Ref, ref } from 'vue';
 import { CbrDraggableEngine, DraggableEngineOptions } from '@/cbrDraggableEngine.ts';
@@ -20,6 +20,7 @@ describe('cbrDraggableEngine', () => {
             <div id="draggable-item"></div>
             <div class="pin-area"></div>
             <div class="free-area"></div>
+            <div class="hover-area"></div>
         </div>
       </body>
     </html>`);
@@ -40,7 +41,8 @@ describe('cbrDraggableEngine', () => {
   const draggableElementMock = {
     get htmlElement(): HTMLElement { return draggableRef.value; },
     get valid(): boolean { return true; },
-    restoreSavedProps(): void { }
+    restoreSavedProps(): void { },
+    addAsChildToElement(element: HTMLElement): void { }
   } as CbrDraggableElement;
 
   const options: DraggableEngineOptions = {
@@ -199,6 +201,106 @@ describe('cbrDraggableEngine', () => {
       expect(forEachListenerSpy).toHaveBeenCalled();
       expect(onUnpinSpy).toHaveBeenCalled();
       expect(receivedEvent).toEqual(unpinEvent);
+    });
+  });
+
+  describe('pin', () => {
+
+    test('invalid element', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const pinElement = jsdom.window.document.querySelector('.pin-area') as HTMLElement;
+
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get')
+        .mockReturnValue(false);
+      const forEachListenerSpy = vi.spyOn(draggableEngine, 'forEachListener')
+        .mockImplementation(() => { });
+
+      draggableEngine.pin(pinElement);
+
+      expect(elementValidSpy).toHaveBeenCalled();
+      expect(forEachListenerSpy).not.toHaveBeenCalled();
+    });
+
+    test('hover area same as pin area', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const pinElement = jsdom.window.document.querySelector('.pin-area') as HTMLElement;
+
+      const pinEvent = {
+        draggableElement: draggableRef.value,
+        pinArea: pinElement
+      } as CbrPinEvent;
+
+      let pinEventReceived: CbrPinEvent | undefined;
+      let parentElementReceived: HTMLElement | undefined;
+
+      const dispatchPinEventSpy = vi.spyOn(draggableEngine, 'dispatchPinEvent')
+        .mockImplementation((event: CbrPinEvent) => {
+          pinEventReceived = event;
+        });
+      const updateStateAfterPinSpy = vi.spyOn(draggableEngine, 'updateStateAfterPin')
+        .mockImplementation(() => { });
+      const addAsChildToElementSpy = vi.spyOn(draggableEngine.element_, 'addAsChildToElement')
+        .mockImplementation((element: HTMLElement) => {
+          parentElementReceived = element;
+        });
+
+      draggableEngine.pin(pinElement);
+
+      expect(dispatchPinEventSpy).toHaveBeenCalled();
+      expect(pinEventReceived).toEqual(pinEvent);
+      expect(updateStateAfterPinSpy).toHaveBeenCalled();
+      expect(addAsChildToElementSpy).toHaveBeenCalled();
+      expect(parentElementReceived).toBe(pinElement);
+    });
+
+    test('hover area different as pin area', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const pinArea = jsdom.window.document.querySelector('.pin-area') as HTMLElement;
+      const hoverElement = jsdom.window.document.querySelector('.hover-area') as HTMLElement;
+
+      const pinEvent = {
+        draggableElement: draggableRef.value,
+        pinArea: pinArea
+      } as CbrPinEvent;
+
+      const unpinnedEvent = {
+        element: draggableRef.value,
+        pinArea: pinArea
+      } as CbrUnpinnedEvent;
+
+      let pinEventReceived: CbrPinEvent | undefined;
+      let unpinnedEventReceived: CbrUnpinnedEvent | undefined;
+      let parentElementReceived: HTMLElement | undefined;
+
+      const dispatchPinEventSpy = vi.spyOn(draggableEngine, 'dispatchPinEvent')
+        .mockImplementation((event: CbrPinEvent) => {
+          pinEventReceived = event;
+        });
+      const dispatchUnpinnedEventSpy = vi.spyOn(draggableEngine, 'dispatchUnpinnedEvent')
+          .mockImplementation((event : CbrUnpinnedEvent) => {
+            unpinnedEventReceived = event;
+          });
+      const updateStateAfterPinSpy = vi.spyOn(draggableEngine, 'updateStateAfterPin')
+        .mockImplementation(() => { });
+      const addAsChildToElementSpy = vi.spyOn(draggableEngine.element_, 'addAsChildToElement')
+        .mockImplementation((element: HTMLElement) => {
+          parentElementReceived = element;
+        });
+
+      draggableEngine.state.value.hoverArea = hoverElement;
+      draggableEngine.state.value.pinArea = pinArea;
+      draggableEngine.pin(pinArea);
+
+      expect(dispatchPinEventSpy).toHaveBeenCalled();
+      expect(pinEventReceived).toEqual(pinEvent);
+      expect(updateStateAfterPinSpy).toHaveBeenCalled();
+      expect(addAsChildToElementSpy).toHaveBeenCalled();
+      expect(parentElementReceived).toBe(pinArea);
+      expect(dispatchUnpinnedEventSpy).toHaveBeenCalled();
+      expect(unpinnedEventReceived).toEqual(unpinnedEvent);
     });
   });
 
