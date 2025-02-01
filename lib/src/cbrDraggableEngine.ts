@@ -228,42 +228,46 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         let dropArea = this.getDropAreaFromPoint(clientX, clientY)
 
         if (dropArea !== this.state.value.hoverArea) {
-            if (dropArea) {
-                const hoverEnterEvent : CbrHoverEnterEvent = {
-                    element: this.element_.htmlElement,
-                    dropArea: dropArea,
-                    dropPrevented: false,
-                    preventDrop: () => {
-                        hoverEnterEvent.dropPrevented = true;
-                    }
-                };
+            this.onDragMoveDropAreaChanged(dropArea);
+        }
+    }
 
-                this.forEachListener((eventListener) => {
-                    eventListener.onHoverEnter(this, hoverEnterEvent);
-                });
-
-                if (hoverEnterEvent.dropPrevented) {
-                    console.log('drop prevented');
-                    dropArea = undefined;
+    onDragMoveDropAreaChanged(dropArea: HTMLElement | undefined) {
+        if (dropArea) {
+            const hoverEnterEvent : CbrHoverEnterEvent = {
+                element: this.element_.htmlElement,
+                dropArea: dropArea,
+                dropPrevented: false,
+                preventDrop: () => {
+                    hoverEnterEvent.dropPrevented = true;
                 }
-            }
-            else {
-                const hoverExitEvent : CbrHoverExitEvent = {
-                    element: this.element_.htmlElement,
-                    dropArea: this.state.value.hoverArea
-                };
+            };
 
-                this.forEachListener((eventListener) => {
-                    eventListener.onHoverExit(this, hoverExitEvent);
-                });
-            }
+            this.forEachListener((eventListener) => {
+                eventListener.onHoverEnter(this, hoverEnterEvent);
+            });
 
-            this.setState({
-                state: CbrDraggableStateEnum.DRAGGING,
-                hoverArea: dropArea,
-                pinArea: this.state.value.pinArea
+            if (hoverEnterEvent.dropPrevented) {
+                console.log('drop prevented');
+                dropArea = undefined;
+            }
+        }
+        else {
+            const hoverExitEvent : CbrHoverExitEvent = {
+                element: this.element_.htmlElement,
+                dropArea: this.state.value.hoverArea
+            };
+
+            this.forEachListener((eventListener) => {
+                eventListener.onHoverExit(this, hoverExitEvent);
             });
         }
+
+        this.setState({
+            state: CbrDraggableStateEnum.DRAGGING,
+            hoverArea: dropArea,
+            pinArea: this.state.value.pinArea
+        });
     }
 
     /**
