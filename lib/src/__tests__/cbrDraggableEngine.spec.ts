@@ -640,6 +640,68 @@ describe('cbrDraggableEngine', () => {
     });
   });
 
+  describe('dispatchDragStartEvent', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onDragStart(draggable: CbrDraggableInterface): void {
+        }
+      } as CbrDraggableEventsListenerInterface;
+
+      let receivedDraggable: CbrDraggableInterface | undefined;
+
+      const listenerSpy = vi.spyOn(listener, 'onDragStart')
+          .mockImplementation((draggable: CbrDraggableInterface) => {
+            receivedDraggable = draggable;
+          });
+
+      draggableEngine.addEventListener(listener);
+
+      draggableEngine.dispatchDragStartEvent();
+
+      expect(listenerSpy).toHaveBeenCalled();
+      expect(receivedDraggable).toBe(draggableEngine);
+    })
+  });
+
+  describe('dispatchHoverEnterEvent', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void {
+        }
+      } as CbrDraggableEventsListenerInterface;
+
+      const hoverArea = jsdom.window.document.querySelector('.hover-area') as HTMLElement;
+
+      const event: CbrHoverEnterEvent = {
+        element: draggableEngine.element_.htmlElement,
+        dropArea: hoverArea,
+        dropPrevented: false,
+        preventDrop: () => {}
+      };
+      
+      let receivedDraggable: CbrDraggableInterface | undefined;
+      let receivedHoverArea: HTMLElement | undefined;
+
+      const listenerSpy = vi.spyOn(listener, 'onHoverEnter')
+          .mockImplementation((draggable: CbrDraggableInterface, event: CbrHoverEnterEvent) => {
+            receivedDraggable = draggable;
+            receivedHoverArea = event.dropArea as HTMLElement;
+          });
+
+      draggableEngine.addEventListener(listener);
+
+      draggableEngine.dispatchHoverEnterEvent(event);
+
+      expect(listenerSpy).toHaveBeenCalled();
+      expect(receivedDraggable).toBe(draggableEngine);
+      expect(receivedHoverArea).toBe(hoverArea);
+    });
+  });
+
   describe('onDragStart', () => {
     test('success path', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);
@@ -648,19 +710,27 @@ describe('cbrDraggableEngine', () => {
 
       const setStateSpy = vi.spyOn(draggableEngine, 'setState')
         .mockImplementation((state: CbrDraggableState) => { receivedState = state; });
+      const startDragModeSpy = vi.spyOn(draggableEngine.element_, 'startDragMode')
+          .mockImplementation((clientX: number, clientY: number) => { });
+      const dispatchDragStartEventSpy = vi.spyOn(draggableEngine, 'dispatchDragStartEvent')
+          .mockImplementation(() => {});
 
       draggableEngine.onDragStart(0, 0);
 
       expect(setStateSpy).toHaveBeenCalled();
       expect(receivedState).not.toBeUndefined();
       expect(receivedState?.state).toBe(CbrDraggableStateEnum.DRAGGING);
+      expect(startDragModeSpy).toHaveBeenCalledWith(0, 0);
+      expect(dispatchDragStartEventSpy).toHaveBeenCalledOnce();
     });
 
     test('invalid element', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);
 
-      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get').mockReturnValue(false);
-      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => { });
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get')
+          .mockReturnValue(false);
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState')
+          .mockImplementation(() => { });
 
       draggableEngine.onDragStart(0, 0);
 
@@ -725,10 +795,6 @@ describe('cbrDraggableEngine', () => {
     test('dropArea defined', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);
 
-      const listener = {
-        onHoverEnter(draggable: CbrDraggableInterface, event: CbrHoverEnterEvent): void { }
-      } as CbrDraggableEventsListenerInterface;
-
       let receivedEvent : CbrHoverEnterEvent | undefined;
       let stateReceived : CbrDraggableState | undefined;
 
@@ -736,17 +802,16 @@ describe('cbrDraggableEngine', () => {
 
       const setStateSpy = vi.spyOn(draggableEngine, 'setState')
         .mockImplementation((state: CbrDraggableState) => { stateReceived = state; });
-      const onHoverEnterSpy = vi.spyOn(listener, 'onHoverEnter')
-        .mockImplementation((draggable: CbrDraggableInterface, event: CbrHoverEnterEvent) => { receivedEvent = event;});
+      const dispatchHoverEnterEventSpy = vi.spyOn(draggableEngine, 'dispatchHoverEnterEvent')
+          .mockImplementation((event: CbrHoverEnterEvent) => { receivedEvent = event; });
 
       draggableEngine.state.value.hoverArea = jsdom.window.document.querySelector('.hover-area') as HTMLElement;
       draggableEngine.state.value.pinArea = dropAreaElement;
 
-      draggableEngine.addEventListener(listener);
       draggableEngine.onDragMoveDropAreaChanged(dropAreaElement);
 
       expect(setStateSpy).toHaveBeenCalled();
-      expect(onHoverEnterSpy).toHaveBeenCalled();
+      expect(dispatchHoverEnterEventSpy).toHaveBeenCalled();
       expect(receivedEvent).not.toBeUndefined();
       expect(receivedEvent?.element).toBe(draggableRef.value);
       expect(receivedEvent?.dropArea).toBe(dropAreaElement);
@@ -823,6 +888,93 @@ describe('cbrDraggableEngine', () => {
       expect(stateReceived.hoverArea).toBeUndefined();
       expect(stateReceived.state).toBe(CbrDraggableStateEnum.DRAGGING);
       expect(stateReceived.pinArea).toBe(dropAreaElement);
+    });
+  });
+
+  describe('onDragEnd', () => {
+    test('no valid element', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock the draggable element's validity to be false
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get').mockReturnValue(false);
+      // Spy on setState and dispatch external calls to ensure they are not called
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => {});
+      const dispatchUnpinnedEventSpy = vi.spyOn(draggableEngine, 'dispatchUnpinnedEvent').mockImplementation(() => {});
+
+      // Call the method under test
+      draggableEngine.onDragEnd();
+
+      // Expectations - since the element is invalid, no state changes or events should have been dispatched
+      expect(elementValidSpy).toHaveBeenCalled();
+      expect(setStateSpy).not.toHaveBeenCalled();
+      expect(dispatchUnpinnedEventSpy).not.toHaveBeenCalled();
+    });
+
+    test('valid element and hoverArea present', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Set up a valid element and a hoverArea
+      const hoverAreaElement = jsdom.window.document.querySelector('.hover-area') as HTMLElement;
+      draggableEngine.state.value.hoverArea = hoverAreaElement;
+
+      // Mock the draggable element to be valid
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get')
+          .mockReturnValue(true);
+
+      let pinElementReceived : HTMLElement | undefined;
+
+      // Spy on methods that should be called during onDragEnd
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState')
+          .mockImplementation(() => {});
+      const pinSpy = vi.spyOn(draggableEngine, 'pin')
+          .mockImplementation((element: HTMLElement) => { pinElementReceived = element; });
+
+      // Call the method under test
+      draggableEngine.onDragEnd();
+
+      // Assertions
+      // 1. The draggable element is valid
+      expect(elementValidSpy).toHaveBeenCalled();
+
+      // 2. Ensure the `pin` method was called with the hover area
+      expect(pinSpy).toHaveBeenCalled();
+      expect(pinElementReceived).not.toBeUndefined();
+      expect(pinElementReceived).toBe(hoverAreaElement);
+
+      // 3. Ensure no unwanted state changes occurred directly
+      expect(setStateSpy).not.toHaveBeenCalled();
+    });
+
+    test('valid element and no hoverArea present', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock the draggable element to be valid
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get')
+          .mockReturnValue(true);
+
+      const pinAreaElement : HTMLElement = jsdom.window.document.querySelector('.pin-area') as HTMLElement;
+
+      // Ensure hoverArea is not set
+      draggableEngine.state.value.hoverArea = undefined;
+      draggableEngine.state.value.pinArea = pinAreaElement;
+
+      let receivedState : CbrDraggableState | undefined;
+
+      // Spy on methods called during onDragEnd
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState')
+          .mockImplementation((state: CbrDraggableState) => { receivedState = state; });
+
+      // Call the method under test
+      draggableEngine.onDragEnd();
+
+      // Assertions
+      // 1. The draggable element should be valid
+      expect(elementValidSpy).toHaveBeenCalled();
+
+      // 3. Ensure the state is set to FREE
+      expect(setStateSpy).toHaveBeenCalled();
+      expect(receivedState).not.toBeUndefined();
+      expect(receivedState.pinArea).toBe(pinAreaElement);
     });
   });
 });

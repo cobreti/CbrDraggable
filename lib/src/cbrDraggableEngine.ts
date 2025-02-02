@@ -191,6 +191,18 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         });
     }
 
+    dispatchDragStartEvent() {
+        this.forEachListener((eventListener) => {
+            eventListener.onDragStart(this);
+        });
+    }
+
+    dispatchHoverEnterEvent(event: CbrHoverEnterEvent) {
+        this.forEachListener((eventListener: CbrDraggableEventsListenerInterface): void => {
+            eventListener.onHoverEnter(this, event);
+        });
+    }
+
     /**
      * on drag start event handler
      *  called by mouse down or touch start event
@@ -200,7 +212,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return;
         }
 
-        this.forEachListener((listener) => listener.onDragStart(this));
+        this.dispatchDragStartEvent();
 
         this.element_.startDragMode(clientX, clientY);
 
@@ -243,9 +255,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
                 }
             };
 
-            this.forEachListener((eventListener) => {
-                eventListener.onHoverEnter(this, hoverEnterEvent);
-            });
+            this.dispatchHoverEnterEvent(hoverEnterEvent);
 
             if (hoverEnterEvent.dropPrevented) {
                 console.log('drop prevented');
