@@ -209,6 +209,12 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         });
     }
 
+    dispatchDragEndEvent() {
+        this.forEachListener((eventListener) => {
+            eventListener.onDragEnd(this);
+        });
+    }
+
     /**
      * on drag start event handler
      *  called by mouse down or touch start event
@@ -274,9 +280,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
                 dropArea: this.state.value.hoverArea
             };
 
-            this.forEachListener((eventListener) => {
-                eventListener.onHoverExit(this, hoverExitEvent);
-            });
+            this.dispatchHoverExitEvent(hoverExitEvent);
         }
 
         this.setState({
@@ -295,7 +299,8 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return;
         }
 
-        this.forEachListener((listener) => listener.onDragEnd(this));
+        // this.forEachListener((listener) => listener.onDragEnd(this));
+        this.dispatchDragEndEvent();
 
         if (this.state.value.hoverArea) {
             this.pin(this.state.value.hoverArea as HTMLElement);
