@@ -702,6 +702,42 @@ describe('cbrDraggableEngine', () => {
     });
   });
 
+  describe('dispatchHoverExitEvent', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const listener = {
+        onHoverExit(draggable: CbrDraggableInterface, event: CbrHoverExitEvent): void {
+        }
+      } as CbrDraggableEventsListenerInterface;
+
+      const hoverArea = jsdom.window.document.querySelector('.hover-area') as HTMLElement;
+
+      const event: CbrHoverExitEvent = {
+        element: draggableEngine.element_.htmlElement,
+        dropArea: hoverArea
+      };
+
+      let receivedDraggable: CbrDraggableInterface | undefined;
+      let receivedHoverExitEvent: CbrHoverExitEvent | undefined;
+
+      const listenerSpy = vi.spyOn(listener, 'onHoverExit')
+          .mockImplementation((draggable: CbrDraggableInterface, event: CbrHoverExitEvent) => {
+            receivedDraggable = draggable;
+            receivedHoverExitEvent = event;
+          });
+
+      draggableEngine.addEventListener(listener);
+
+      draggableEngine.dispatchHoverExitEvent(event);
+
+      expect(listenerSpy).toHaveBeenCalled();
+      expect(receivedDraggable).toBe(draggableEngine);
+      expect(receivedHoverExitEvent).not.toBeUndefined();
+      expect(receivedHoverExitEvent.dropArea).toBe(hoverArea);
+    });
+  });
+
   describe('onDragStart', () => {
     test('success path', () => {
       const draggableEngine = new CbrDraggableEngine(props, options);

@@ -203,6 +203,12 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
         });
     }
 
+    dispatchHoverExitEvent(event: CbrHoverExitEvent) {
+        this.forEachListener((eventListener: CbrDraggableEventsListenerInterface): void => {
+            eventListener.onHoverExit(this, event);
+        });
+    }
+
     /**
      * on drag start event handler
      *  called by mouse down or touch start event
