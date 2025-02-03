@@ -94,6 +94,24 @@ describe('cbrDraggableEngine', () => {
     });
   }
 
+  type createMouseEventType = 'mousedown' | 'mouseup' | 'mousemove';
+  type createMouseEventOptions = {
+    target?: HTMLElement | null
+  };
+
+  function createMouseEvent(type: createMouseEventType, clientX: number, clientY: number, options: createMouseEventOptions = {}) : MouseEvent {
+    return new MouseEvent(type, {
+      relatedTarget: options.target ?? null,
+      bubbles: true,
+      cancelable: true,
+      clientX: clientX,
+      clientY: clientY,
+      screenX: clientX + 10, // Offset for emulating realistic coordinates
+      screenY: clientY + 10, // Offset for emulating realistic coordinates
+      button: 0 // Left mouse button pressed
+    });
+  }
+
   let props: CbrDraggableProps;
 
   beforeEach(() => {
@@ -1289,6 +1307,85 @@ describe('cbrDraggableEngine', () => {
 
       expect(canPickSpy).toHaveBeenCalled(); // Ensure canPick was called
       expect(result).toBeFalsy(); // Since canPick is false, onTouchStart should return false
+    });
+  });
+  
+  describe('onMouseDown', () => {
+
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(true);
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart').mockImplementation(() => {
+      });
+
+      const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
+
+      const elm = jsdom.window.document.createElement('div');
+      elm.classList.add('draggable-item');
+      vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(elm);
+
+      const result = draggableEngine.onMouseDown(mockMouseEvent);
+
+      expect(canPickSpy).toHaveBeenCalled(); // Ensure canPick was called
+      expect(onDragStartSpy).toHaveBeenCalledWith(100, 150); // Ensure onDragStart is called with correct params
+      expect(result).toBeTruthy(); // Expect the function to return true in the success path
+    });
+    
+    test('target is null', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart')
+          .mockImplementation(() => {
+          });
+
+      const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
+      vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(null); // Mock target to be null
+
+      const result = draggableEngine.onMouseDown(mockMouseEvent);
+
+      expect(onDragStartSpy).not.toHaveBeenCalled(); // onDragStart should not be called
+      expect(result).toBeFalsy(); // Expect the function to return false since target is null
+    });
+
+
+    test('target element closest returns null', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart').mockImplementation(() => {
+      });
+
+      const elm = jsdom.window.document.createElement('div');
+
+      const closestSpy = vi.spyOn(elm, 'closest').mockReturnValue(null); // Mock closest to return null
+
+      const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
+      vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(elm);
+
+      const result = draggableEngine.onMouseDown(mockMouseEvent);
+
+      expect(closestSpy).toHaveBeenCalled(); // Verify closest was called
+      expect(onDragStartSpy).not.toHaveBeenCalled(); // onDragStart should not be called
+      expect(result).toBeFalsy(); // Expect the function to return false
+    });
+
+
+    test('canPick returns false', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock canPick to return false
+      const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(false);
+
+      const elm = jsdom.window.document.createElement('div');
+      elm.classList.add('draggable-item');
+
+      const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
+      vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(elm);
+
+      const result = draggableEngine.onMouseDown(mockMouseEvent);
+
+      expect(canPickSpy).toHaveBeenCalled(); // Ensure canPick was called
+      expect(result).toBeFalsy(); // Since canPick is false, onMouseDown should return false
     });
   });
 });
