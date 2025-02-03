@@ -52,7 +52,8 @@ describe('cbrDraggableEngine', () => {
     restoreSavedProps(): void { },
     addAsChildToElement(element: HTMLElement): void { },
     startDragMode(clientX: number, clientY: number): void { },
-    updateDragTopLeftPosition(clientX: number, clientY: number): void { }
+    updateDragTopLeftPosition(clientX: number, clientY: number): void { },
+    discardSavedProps() {}
   } as CbrDraggableElement;
 
   const options: DraggableEngineOptions = {
@@ -62,6 +63,36 @@ describe('cbrDraggableEngine', () => {
     },
     draggableElementFactory: (options: CbrDraggableElementOptions) => { return draggableElementMock; }
   };
+
+  type CreateTouchEventOptions = {
+    target?: HTMLElement | null
+    touches?: Touch[] | null;
+  };
+
+  function createTouchEvent(clientX: number, clientY: number, options: CreateTouchEventOptions = {}): TouchEvent {
+    return new TouchEvent('touchstart', {
+      bubbles: true,
+      cancelable: true,
+      touches: options.touches ?? [
+        {
+          identifier: 1,
+          target: options.target ?? null,
+          clientX: clientX,
+          clientY: clientY,
+          screenX: 160,
+          screenY: 210,
+          pageX: 170,
+          pageY: 220,
+          radiusX: 0,
+          radiusY: 0,
+          rotationAngle: 0,
+          force: 0,
+        } as Touch,
+      ],
+      targetTouches: [],
+      changedTouches: [],
+    });
+  }
 
   let props: CbrDraggableProps;
 
@@ -1057,6 +1088,207 @@ describe('cbrDraggableEngine', () => {
       expect(setStateSpy).toHaveBeenCalled();
       expect(receivedState).not.toBeUndefined();
       expect(receivedState.pinArea).toBe(pinAreaElement);
+    });
+  });
+
+  describe('onDragCanceled', () => {
+    test('invalid element', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock the draggableElement's validity to be false
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get').mockReturnValue(false);
+
+      // Spy on methods to ensure they are not called
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => {});
+      const dispatchDragEndEventSpy = vi.spyOn(draggableEngine, 'dispatchDragEndEvent').mockImplementation(() => {});
+      const restoreSavedPropsSpy = vi.spyOn(draggableElementMock, 'restoreSavedProps').mockImplementation(() => {});
+
+      // Call the method
+      draggableEngine.onDragCanceled();
+
+      // Assertions
+      expect(elementValidSpy).toHaveBeenCalled(); // Ensure validity was checked
+      expect(setStateSpy).not.toHaveBeenCalled(); // No state changes should occur
+      expect(dispatchDragEndEventSpy).not.toHaveBeenCalled(); // No events should be dispatched
+      expect(restoreSavedPropsSpy).not.toHaveBeenCalled(); // Props should not be restored
+    });
+
+    test('valid element', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock the draggableElement's validity to be true
+      const elementValidSpy = vi.spyOn(draggableElementMock, 'valid', 'get').mockReturnValue(true);
+
+      // Spy on methods to ensure expected calls
+      const setStateSpy = vi.spyOn(draggableEngine, 'setState').mockImplementation(() => {});
+      const dispatchDragEndEventSpy = vi.spyOn(draggableEngine, 'dispatchDragEndEvent').mockImplementation(() => {});
+
+      // Call the method
+      draggableEngine.onDragCanceled();
+
+      // Assertions
+      expect(elementValidSpy).toHaveBeenCalled(); // Ensure validity was checked
+      expect(setStateSpy).toHaveBeenCalledWith({
+        state: CbrDraggableStateEnum.FREE
+      }); // State should be set to FREE
+      expect(dispatchDragEndEventSpy).toHaveBeenCalled(); // Drag end event should be dispatched
+    });
+  });
+  
+  describe('onTouchMove', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+      
+      const onDragMoveSpy = vi.spyOn(draggableEngine, 'onDragMove').mockImplementation(() => {});
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(150, 200);
+
+      draggableEngine.onTouchMove(mockTouchEvent);
+
+      expect(onDragMoveSpy).toHaveBeenCalledWith(
+        mockTouchEvent.touches[0].clientX,
+        mockTouchEvent.touches[0].clientY
+      );
+    });
+  });
+
+  describe('onTouchEnd', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragEndSpy = vi.spyOn(draggableEngine, 'onDragEnd')
+          .mockImplementation(() => {});
+
+      const touchEvent = createTouchEvent(150, 200);
+
+      draggableEngine.onTouchEnd(touchEvent);
+
+      expect(onDragEndSpy).toHaveBeenCalled();
+    });
+  });
+  
+  describe('onTouchCancel', () => {
+
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragCanceledSpy = vi.spyOn(draggableEngine, 'onDragCanceled')
+          .mockImplementation(() => {
+          });
+
+      const touchEvent = createTouchEvent(150, 200);
+
+      draggableEngine.onTouchCancel(touchEvent);
+
+      expect(onDragCanceledSpy).toHaveBeenCalled();
+    });
+  });
+
+  describe('onTouchStart', () => {
+
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock canPick to return true
+      const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(true);
+
+      const elm = jsdom.window.document.createElement('div');
+      elm.classList.add('draggable-item');
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart').mockImplementation(() => {
+      });
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
+        target: elm
+      });
+
+      const result = draggableEngine.onTouchStart(mockTouchEvent);
+
+      expect(canPickSpy).toHaveBeenCalled(); // Ensure canPick was called
+      expect(onDragStartSpy).toHaveBeenCalledWith(
+          mockTouchEvent.touches[0].clientX,
+          mockTouchEvent.touches[0].clientY); // onDragStart should be called with the correct params
+      expect(result).toBeTruthy(); // Since this is the success path, expect true
+    });
+    
+    test('no touch item in list', () => {
+
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart')
+          .mockImplementation(() => {
+          });
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
+        touches: []
+      });
+
+      const ret = draggableEngine.onTouchStart(mockTouchEvent);
+
+      expect(onDragStartSpy).not.toHaveBeenCalled();
+      expect(ret).toBeFalsy();
+    });
+
+    test('no target element', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart')
+          .mockImplementation(() => {
+      });
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
+        target: null
+      });
+
+      const ret = draggableEngine.onTouchStart(mockTouchEvent);
+
+      expect(onDragStartSpy).not.toHaveBeenCalled();
+      expect(ret).toBeFalsy();
+    });
+
+    test('no closest draggable-item class', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart')
+          .mockImplementation(() => {
+          });
+
+      const elm = jsdom.window.document.createElement('div');
+
+      const elmClosestSpy = vi.spyOn(elm, 'closest')
+          .mockImplementation(() => {
+            return null;
+          });
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
+        target: elm // Element without 'draggable-item' class
+      });
+
+      const ret = draggableEngine.onTouchStart(mockTouchEvent);
+
+      expect(elmClosestSpy).toHaveBeenCalled();
+      expect(onDragStartSpy).not.toHaveBeenCalled();
+      expect(ret).toBeFalsy();
+    });
+
+
+    test('canPick returns false', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      // Mock canPick to return false
+      const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(false);
+
+      const elm = jsdom.window.document.createElement('div');
+      elm.classList.add('draggable-item');
+
+      const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
+        target: elm
+      });
+
+      const result = draggableEngine.onTouchStart(mockTouchEvent);
+
+      expect(canPickSpy).toHaveBeenCalled(); // Ensure canPick was called
+      expect(result).toBeFalsy(); // Since canPick is false, onTouchStart should return false
     });
   });
 });

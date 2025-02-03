@@ -327,6 +327,8 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return;
         }
 
+        this.dispatchDragEndEvent();
+
         this.addToFreeArea();
         this.element_.discardSavedProps();
 
@@ -417,7 +419,13 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
      * @param event
      */
     onTouchStart(event: TouchEvent) : boolean {
-        const elm = event.target as HTMLElement;
+        if (event.touches.length == 0) {
+            return false;
+        }
+
+        const touch = event.touches[0];
+
+        const elm = touch.target as HTMLElement;
 
         if (!elm) {
             return false;
