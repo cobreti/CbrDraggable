@@ -1388,4 +1388,42 @@ describe('cbrDraggableEngine', () => {
       expect(result).toBeFalsy(); // Since canPick is false, onMouseDown should return false
     });
   });
+
+  describe('onMouseMove', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const mouseEvent = createMouseEvent('mousemove', 100, 150);
+
+      const preventDefaultSpy = vi.spyOn(mouseEvent, 'preventDefault')
+          .mockImplementation(() => {});
+
+      const onDragMoveSpy = vi.spyOn(draggableEngine, 'onDragMove')
+          .mockImplementation(() => {});
+
+      draggableEngine.onMouseMove(mouseEvent);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+      expect(onDragMoveSpy).toHaveBeenCalledWith(100, 150);
+    });
+  });
+
+  describe('onMouseUp', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const mouseEvent = createMouseEvent('mouseup', 100, 150);
+
+      const preventDefaultSpy = vi.spyOn(mouseEvent, 'preventDefault')
+          .mockImplementation(() => {});
+      const onDragEndSpy = vi.spyOn(draggableEngine, 'onDragEnd')
+          .mockImplementation(() => {});
+
+      draggableEngine.onMouseUp(mouseEvent);
+
+      expect(preventDefaultSpy).toHaveBeenCalled();
+      expect(onDragEndSpy).toHaveBeenCalled();
+    });
+  });
+  
 });
