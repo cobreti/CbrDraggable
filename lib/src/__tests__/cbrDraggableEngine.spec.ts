@@ -1426,4 +1426,47 @@ describe('cbrDraggableEngine', () => {
     });
   });
   
+  describe('addToFreeArea', () => {
+    test('success path', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+
+      const freeAreaSpy = vi.spyOn(props.controller, 'addToFreeArea')
+          .mockImplementation(() => {
+          });
+
+      const element = jsdom.window.document.createElement('div');
+      draggableEngine.freeArea_.value = element;
+
+      draggableEngine.addToFreeArea();
+
+      expect(freeAreaSpy).toHaveBeenCalled();
+    });
+
+    test('no free area value', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+      const freeAreaSpy = vi.spyOn(props.controller, 'addToFreeArea')
+          .mockImplementation(() => {
+          });
+      draggableEngine.freeArea_.value = undefined;
+
+      draggableEngine.addToFreeArea();
+
+      expect(freeAreaSpy).not.toHaveBeenCalled();
+    });
+
+    test('element not valid', () => {
+      const draggableEngine = new CbrDraggableEngine(props, options);
+      const freeAreaSpy = vi.spyOn(props.controller, 'addToFreeArea')
+          .mockImplementation(() => {
+          });
+      const elementValid = vi.spyOn(draggableEngine.element_, "valid", "get")
+          .mockReturnValue(false);
+      draggableEngine.freeArea_.value = jsdom.window.document.createElement('div');
+
+      draggableEngine.addToFreeArea();
+
+      expect(freeAreaSpy).not.toHaveBeenCalled();
+    });
+  });
+
 });

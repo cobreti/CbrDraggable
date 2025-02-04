@@ -46,7 +46,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             });
 
         options.hooks.onMounted( () => {
-            this.freeArea.value = this.props.controller.freeAreaElement;
+            this.freeArea.value = this.props.controller?.freeAreaElement;
             this.props.controller?.registerDraggable(this);
             if (this.props_.eventListener) {
                 this.eventListeners_.add(this.props_.eventListener);
@@ -459,15 +459,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return;
         }
 
-        if (!this.props.controller) {
-            return;
-        }
-
-        let freeAreaParent = this.element_.htmlElement.closest(this.props.controller.freeAreaSelector);
-
-        if (!freeAreaParent) {
-            this.props.controller.addToFreeArea(this.element_.htmlElement, this.freeArea.value as HTMLElement);
-        }
+       this.props.controller?.addToFreeArea(this.element_.htmlElement, this.freeArea.value as HTMLElement);
     }
 
 }
