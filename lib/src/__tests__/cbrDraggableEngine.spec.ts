@@ -1,3 +1,6 @@
+// @vitest-environment jsdom
+// @vitest-environment-options { "url": "https://example.com/" }
+
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
   CbrDraggableProps,
@@ -10,7 +13,7 @@ import {
 } from '@/cbrDragNDropTypes.ts';
 import { JSDOM } from 'jsdom';
 import { Ref, ref } from 'vue';
-import { CbrDraggableEngine, DraggableEngineOptions } from '@/cbrDraggableEngine.ts';
+import {CbrDraggableElementFactory, CbrDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.ts';
 import { CbrDraggableController, CbrDraggableControllerOptions } from '@/cbrDraggableController.ts';
 import { CbrDraggableElement, CbrDraggableElementOptions } from '@/cbrDraggableElement.js';
 import { CbrDraggableEventsListenerInterface, type CbrDraggableInterface } from '@/cbrDraggableInterface.js';
@@ -1466,6 +1469,31 @@ describe('cbrDraggableEngine', () => {
       draggableEngine.addToFreeArea();
 
       expect(freeAreaSpy).not.toHaveBeenCalled();
+    });
+  });
+
+  describe('CbrDraggableElementFactory', () => {
+    test('should create a new CbrDraggableElement instance with the given options', () => {
+
+      const elm = jsdom.window.document.createElement('div');
+      // Mock options for creating CbrDraggableElement
+      const mockOptions: CbrDraggableElementOptions = {
+        draggableRef: ref(elm),
+        hooks: {
+          onMounted: vi.fn().mockImplementation( (callback: () => void) => { callback(); })
+        }
+      };
+
+      // Call the factory function
+      const draggableElement = CbrDraggableElementFactory(mockOptions);
+
+      // Assertions
+      expect(draggableElement).toBeInstanceOf(CbrDraggableElement);
+      expect(draggableElement.element_).not.toBeNull();
+      expect(draggableElement.element_).toBe(elm);
+
+      // Ensure that hooks have not been called yet
+      expect(mockOptions.hooks.onMounted).toHaveBeenCalled();
     });
   });
 
