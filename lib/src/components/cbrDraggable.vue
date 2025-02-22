@@ -28,11 +28,11 @@
 
 <script setup lang="ts">
 
-import {onMounted, provide, useTemplateRef} from 'vue'
+  import {onMounted, provide, useTemplateRef} from 'vue'
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
-import {CbrDraggableElementFactory, CbrDraggableEngine} from '@/cbrDraggableEngine.js';
+  import {CbrDraggableElementFactory, CbrDraggableEngine} from '@/cbrDraggableEngine.js';
   import {draggableInjectionKey} from '@/keys.js';
   import {CbrDraggableEventsListener_ESAdd} from '@/eventsListeners/cbrDraggableEventsListener_ESAdd.js';
   import {CbrDraggableEventsListener_ESRemove} from '@/eventsListeners/cbrDraggableEventsListener_ESRemove.js';
