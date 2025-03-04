@@ -7,11 +7,14 @@ export default mergeConfig(
     defineConfig({
         test: {
             environment: 'jsdom',
+            environmentOptions: {
+              url: 'https://localhost'
+            },
             exclude: [...configDefaults.exclude, 'e2e/*'],
             root: fileURLToPath(new URL('./', import.meta.url)),
             coverage: {
-                provider: 'istanbul',
-                reporter: ['html', 'lcov', 'text-summary'],
+              provider: 'istanbul',
+              reporter: ['html', 'lcov', 'text-summary'],
             }
         }
     })
