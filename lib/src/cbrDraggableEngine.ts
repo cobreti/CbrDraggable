@@ -1,4 +1,4 @@
-import {ref, Ref} from 'vue';
+import {onMounted, ref, Ref, useTemplateRef} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
     CbrDraggableProps,
@@ -9,6 +9,10 @@ import {
 } from '@/cbrDragNDropTypes.js';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {CbrDraggableElement, CbrDraggableElementOptions} from '@/cbrDraggableElement.js';
+
+export function createDraggableEngine(props: CbrDraggableProps, options: DraggableEngineOptions) : CbrDraggableEngine {
+    return new CbrDraggableEngine(props, options);
+}
 
 export class EventListenersInterfacesTable extends Set<CbrDraggableEventsListenerInterface> {}
 

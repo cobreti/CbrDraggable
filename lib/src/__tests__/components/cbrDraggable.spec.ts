@@ -1,11 +1,10 @@
 import { mount, config } from '@vue/test-utils';
-import { describe, test, expect, vi, beforeEach } from 'vitest';
+import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
 import  CbrDraggable from '../../components/cbrDraggable.vue';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {CbrDraggableInterface} from '@/cbrDraggableInterface.js';
-import {defineComponent, provide} from 'vue';
-
-
+import {CbrDraggableEngine} from '@/cbrDraggableEngine.js';
+import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
 
 
 
@@ -16,6 +15,7 @@ describe('CbrDraggable component', () => {
     }
   } as CbrDraggableControllerInterface;
 
+
   beforeEach(() => {
     config.global.mocks = {
       provide: (key: any, value: any) => {
@@ -24,9 +24,13 @@ describe('CbrDraggable component', () => {
     };
   });
 
-  test('provide called', () => {
+  afterEach(() => {
+    vi.clearAllMocks();
+    vi.resetAllMocks();
+  })
 
-    const hoistedFct = vi.hoisted(() => {
+  test('provide called', () => {
+    const provideHoistedFct = vi.hoisted(() => {
       return {
         provide: vi.fn()
       }
@@ -35,11 +39,11 @@ describe('CbrDraggable component', () => {
     vi.mock('vue', async (importOriginal) => {
       return {
         ...await importOriginal(),
-        provide: hoistedFct.provide
+        provide: provideHoistedFct.provide
       }
     });
 
-    const provideSpy = vi.spyOn(hoistedFct, 'provide');
+    const provideSpy = vi.spyOn(provideHoistedFct, 'provide');
 
     const draggable = mount(CbrDraggable,{
       template: `<div>test</div>`,
@@ -50,5 +54,47 @@ describe('CbrDraggable component', () => {
     });
 
     expect(provideSpy).toHaveBeenCalled();
-  })
+  });
+
+  test('draggable core instance exists and event listeners called', () => {
+
+    const draggableCore = {
+      addEventListener: vi.fn(),
+      removeEventListener: vi.fn()
+    } as Partial<CbrDraggableEngine> as CbrDraggableEngine;
+
+
+    const createDraggableEngineHoistedFct = vi.hoisted(() => {
+      return {
+        createDraggableEngine: vi.fn()
+      }
+    });
+
+    vi.mock('@/cbrDraggableEngine.js', async (importOriginal) => {
+      return {
+        ...await importOriginal(),
+        createDraggableEngine: createDraggableEngineHoistedFct.createDraggableEngine
+      }
+    });
+
+    // vi.spyOn(global, 'createDraggableEngine')
+    //   .mockImplementation((props: CbrDraggableProps) => {
+    //     return draggableCore;
+    //   });
+
+    const draggable = mount(CbrDraggable,{
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableEngine
+      },
+      global: {
+        mocks: {
+          createDraggableEngine: (props: CbrDraggableProps): CbrDraggableEngine => {
+            return draggableCore;
+          }
+        }
+      }
+    });
+  });
 });
