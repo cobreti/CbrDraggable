@@ -4,15 +4,80 @@ import  CbrDraggable from '../../components/cbrDraggable.vue';
 import {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {CbrDraggableEngine, createDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.js';
 import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
+import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
+import {Observable, of} from 'rxjs';
 
 
 
 describe('CbrDraggable component', () => {
 
-  const draggableEngine = {
-    registerDraggable: (draggable: CbrDraggableInterface) => {},
-    addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {}
-  } as Partial<CbrDraggableInterface>;
+  // const draggableEngine = {
+  //   registerDraggable: (draggable: CbrDraggableInterface) => {},
+  //   addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {}
+  // } as CbrDraggableInterface;
+
+  const draggableEngine: CbrDraggableInterface = {
+    id: 'mock-id',
+    pinArea: undefined,
+    hoverArea: undefined,
+    element: undefined,
+    controller: undefined,
+
+    unpin: () => {},
+    pin: (pinArea: HTMLElement) => {},
+    addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
+    removeEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
+    forEachListener: (callback: (eventListener: CbrDraggableEventsListenerInterface) => void) => {},
+    updateExternalState: (externalState: string, value: any) => {},
+    getExternalState: (externalState: string) => {}
+  };
+
+  const draggableController: CbrDraggableControllerInterface = {
+    pinAreaElement: global.document.createElement('div'),
+    freeAreaElement: global.document.createElement('div'),
+    freeAreaSelector: '.free-area',
+
+    getDropAreaFromPoint: (x: number, y: number): HTMLElement | undefined => {
+      return global.document.createElement('div');
+    },
+
+    canPick: (elm: HTMLElement): boolean => {
+      return true;
+    },
+
+    addToFreeArea: (elm: HTMLElement, freeArea: HTMLElement): void => {
+      // Mock implementation
+    },
+
+    resetElementPosition: (elm: HTMLElement): void => {
+      // Mock implementation
+    },
+
+    registerDraggable: (draggable: CbrDraggableInterface): void => {
+      // Mock implementation
+    },
+
+    getDraggable: (id: string): CbrDraggableInterface => {
+      return {
+        id: 'mock-id',
+        pinArea: undefined,
+        hoverArea: undefined,
+        element: undefined,
+        controller: undefined,
+        unpin: () => {},
+        pin: (pinArea: HTMLElement) => {},
+        addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
+        removeEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
+        forEachListener: (callback: (eventListener: CbrDraggableEventsListenerInterface) => void) => {},
+        updateExternalState: (externalState: string, value: any) => {},
+        getExternalState: (externalState: string) => {}
+      };
+    },
+
+    getDraggableObserver: (id: string): Observable<CbrDraggableInterface | undefined> => {
+      return of(undefined);
+    }
+  };
 
   type HoistedFunctions = {
     provide: () => void,
@@ -69,7 +134,7 @@ describe('CbrDraggable component', () => {
       template: `<div>test</div>`,
       props: {
         id: 'test',
-        controller: draggableEngine
+        controller: draggableController
       }
     });
 
@@ -87,7 +152,7 @@ describe('CbrDraggable component', () => {
       template: `<div>test</div>`,
       props: {
         id: 'test',
-        controller: draggableEngine
+        controller: draggableController
       }
     });
 
