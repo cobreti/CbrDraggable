@@ -11,11 +11,9 @@ import {Observable, of} from 'rxjs';
 
 describe('CbrDraggable component', () => {
 
-  // const draggableEngine = {
-  //   registerDraggable: (draggable: CbrDraggableInterface) => {},
-  //   addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {}
-  // } as CbrDraggableInterface;
-
+  //
+  // stub for draggable engine
+  //
   const draggableEngine: CbrDraggableInterface = {
     id: 'mock-id',
     pinArea: undefined,
@@ -32,6 +30,9 @@ describe('CbrDraggable component', () => {
     getExternalState: (externalState: string) => {}
   };
 
+  //
+  // stub for draggable controller
+  //
   const draggableController: CbrDraggableControllerInterface = {
     pinAreaElement: global.document.createElement('div'),
     freeAreaElement: global.document.createElement('div'),
