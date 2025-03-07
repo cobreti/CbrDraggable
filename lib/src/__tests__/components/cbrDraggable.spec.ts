@@ -58,20 +58,7 @@ describe('CbrDraggable component', () => {
     },
 
     getDraggable: (id: string): CbrDraggableInterface => {
-      return {
-        id: 'mock-id',
-        pinArea: undefined,
-        hoverArea: undefined,
-        element: undefined,
-        controller: undefined,
-        unpin: () => {},
-        pin: (pinArea: HTMLElement) => {},
-        addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
-        removeEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
-        forEachListener: (callback: (eventListener: CbrDraggableEventsListenerInterface) => void) => {},
-        updateExternalState: (externalState: string, value: any) => {},
-        getExternalState: (externalState: string) => {}
-      };
+      return draggableEngine;
     },
 
     getDraggableObserver: (id: string): Observable<CbrDraggableInterface | undefined> => {
