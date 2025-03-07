@@ -1,9 +1,8 @@
 import { mount, config } from '@vue/test-utils';
 import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
 import  CbrDraggable from '../../components/cbrDraggable.vue';
-import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
-import {CbrDraggableInterface} from '@/cbrDraggableInterface.js';
-import {CbrDraggableEngine} from '@/cbrDraggableEngine.js';
+import {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
+import {CbrDraggableEngine, createDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.js';
 import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
 
 
@@ -11,10 +10,42 @@ import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
 describe('CbrDraggable component', () => {
 
   const draggableEngine = {
-    registerDraggable: (draggable: CbrDraggableInterface) => {
-    }
-  } as CbrDraggableControllerInterface;
+    registerDraggable: (draggable: CbrDraggableInterface) => {},
+    addEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {}
+  } as Partial<CbrDraggableInterface>;
 
+  type HoistedFunctions = {
+    provide: () => void,
+    createDraggableEngine: (props: CbrDraggableProps, options: DraggableEngineOptions) => CbrDraggableEngine
+  };
+
+  function setup() : HoistedFunctions {
+    const hoistedFct = vi.hoisted(() => {
+      return {
+        provide: vi.fn(),
+        createDraggableEngine: vi.fn()
+      }
+    });
+
+    vi.mock('vue', async (importOriginal) => {
+      return {
+        ...await importOriginal(),
+        provide: hoistedFct.provide
+      }
+    });
+
+    vi.mock('@/cbrDraggableEngine.js', async (importOriginal) => {
+      return {
+        ...await importOriginal(),
+        createDraggableEngine: hoistedFct.createDraggableEngine
+      }
+    });
+
+    vi.spyOn(hoistedFct, 'createDraggableEngine')
+        .mockReturnValue(draggableEngine);
+
+    return hoistedFct;
+  }
 
   beforeEach(() => {
     config.global.mocks = {
@@ -30,20 +61,9 @@ describe('CbrDraggable component', () => {
   })
 
   test('provide called', () => {
-    const provideHoistedFct = vi.hoisted(() => {
-      return {
-        provide: vi.fn()
-      }
-    });
+    const hoistedFct = setup();
 
-    vi.mock('vue', async (importOriginal) => {
-      return {
-        ...await importOriginal(),
-        provide: provideHoistedFct.provide
-      }
-    });
-
-    const provideSpy = vi.spyOn(provideHoistedFct, 'provide');
+    const provideSpy = vi.spyOn(hoistedFct, 'provide');
 
     const draggable = mount(CbrDraggable,{
       template: `<div>test</div>`,
@@ -58,43 +78,20 @@ describe('CbrDraggable component', () => {
 
   test('draggable core instance exists and event listeners called', () => {
 
-    const draggableCore = {
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn()
-    } as Partial<CbrDraggableEngine> as CbrDraggableEngine;
+    const hoistedFct = setup();
 
-
-    const createDraggableEngineHoistedFct = vi.hoisted(() => {
-      return {
-        createDraggableEngine: vi.fn()
-      }
-    });
-
-    vi.mock('@/cbrDraggableEngine.js', async (importOriginal) => {
-      return {
-        ...await importOriginal(),
-        createDraggableEngine: createDraggableEngineHoistedFct.createDraggableEngine
-      }
-    });
-
-    // vi.spyOn(global, 'createDraggableEngine')
-    //   .mockImplementation((props: CbrDraggableProps) => {
-    //     return draggableCore;
-    //   });
+    const addEventListenerSpy = vi.spyOn(draggableEngine, 'addEventListener');
+    const createDraggableEngineSpy = vi.spyOn(hoistedFct, 'createDraggableEngine');
 
     const draggable = mount(CbrDraggable,{
       template: `<div>test</div>`,
       props: {
         id: 'test',
         controller: draggableEngine
-      },
-      global: {
-        mocks: {
-          createDraggableEngine: (props: CbrDraggableProps): CbrDraggableEngine => {
-            return draggableCore;
-          }
-        }
       }
     });
+
+    expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
+    expect(createDraggableEngineSpy).toHaveBeenCalled();
   });
 });
