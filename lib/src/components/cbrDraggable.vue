@@ -10,7 +10,7 @@
   */
 
 <template>
-  <div class="draggable-content" ref="draggableContent">
+  <div class="draggable" ref="draggableContent">
     <div class="draggable-content" @mousedown="onMouseDown" @touchstart="onTouchStart">
       <slot></slot>
     </div>
@@ -21,6 +21,11 @@
 </template>
 
 <style scoped>
+
+  .draggable {
+    display:  inline-block;
+
+  }
   .draggable-content {
     display: inline-block;
   }
@@ -32,22 +37,12 @@
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
-  import {CbrDraggableElementFactory, CbrDraggableEngine, createDraggableEngine} from '@/cbrDraggableEngine.js';
+  import {CbrDraggableElementFactory, createDraggableEngine} from '@/cbrDraggableEngine.js';
   import {draggableInjectionKey} from '@/keys.js';
   import {CbrDraggableEventsListener_ESAdd} from '@/eventsListeners/cbrDraggableEventsListener_ESAdd.js';
   import {CbrDraggableEventsListener_ESRemove} from '@/eventsListeners/cbrDraggableEventsListener_ESRemove.js';
 
   const props = defineProps<CbrDraggableProps>();
-
-  // function createDraggableEngine(props: CbrDraggableProps) : CbrDraggableEngine {
-  //   return new CbrDraggableEngine(props, {
-  //     draggableRef: useTemplateRef('draggableContent'),
-  //     hooks: {
-  //       onMounted
-  //     },
-  //     draggableElementFactory: CbrDraggableElementFactory
-  //   });
-  // }
 
   const draggableCore = createDraggableEngine(props, {
     draggableRef: useTemplateRef('draggableContent'),
@@ -56,13 +51,6 @@
     },
     draggableElementFactory: CbrDraggableElementFactory
   });
-  // const draggableCore : CbrDraggableEngine = new CbrDraggableEngine(props, {
-  //     draggableRef: useTemplateRef('draggableContent'),
-  //     hooks: {
-  //       onMounted
-  //     },
-  //     draggableElementFactory: CbrDraggableElementFactory
-  //   });
 
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESAdd());
   draggableCore.addEventListener(new CbrDraggableEventsListener_ESRemove());

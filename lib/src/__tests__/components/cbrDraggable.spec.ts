@@ -2,19 +2,19 @@ import { mount, config } from '@vue/test-utils';
 import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
 import  CbrDraggable from '../../components/cbrDraggable.vue';
 import {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
-import {CbrDraggableEngine, createDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.js';
+import {CbrDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.js';
 import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {Observable, of} from 'rxjs';
 
 
 
-describe('CbrDraggable component', () => {
+describe('CbrDraggable component', async () => {
 
   //
   // stub for draggable engine
   //
-  const draggableEngine: CbrDraggableInterface = {
+  const draggableEngine = {
     id: 'mock-id',
     pinArea: undefined,
     hoverArea: undefined,
@@ -27,7 +27,9 @@ describe('CbrDraggable component', () => {
     removeEventListener: (eventListener: CbrDraggableEventsListenerInterface) => {},
     forEachListener: (callback: (eventListener: CbrDraggableEventsListenerInterface) => void) => {},
     updateExternalState: (externalState: string, value: any) => {},
-    getExternalState: (externalState: string) => {}
+    getExternalState: (externalState: string) => {},
+    onMouseDown: (event: MouseEvent): boolean => { return true; },
+    onMouseMove: (event: MouseEvent): void => {},
   };
 
   //
@@ -87,7 +89,7 @@ describe('CbrDraggable component', () => {
       }
     });
 
-    vi.mock('@/cbrDraggableEngine.js', async (importOriginal) => {
+    vi.mock('@/cbrDraggableEngine.ts', async (importOriginal) => {
       return {
         ...await importOriginal(),
         createDraggableEngine: hoistedFct.createDraggableEngine
@@ -146,5 +148,68 @@ describe('CbrDraggable component', () => {
 
     expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
     expect(createDraggableEngineSpy).toHaveBeenCalled();
+  });
+
+  test('mouse down returns true : listener registered', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable,{
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const mouseDownSpy = vi.spyOn(draggableEngine, 'onMouseDown');
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+    await draggable.find('.draggable-content').trigger('mousedown');
+
+    expect(mouseDownSpy).toHaveBeenCalled();
+    expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
+    expect(addEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+  });
+
+  test('mouse down returns false : no listener registered', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable,{
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const mouseDownSpy = vi.spyOn(draggableEngine, 'onMouseDown')
+        .mockReturnValue(false);
+
+    await draggable.find('.draggable-content').trigger('mousedown');
+
+    expect(mouseDownSpy).toHaveBeenCalled();
+  });
+
+  test('mouse move sent to window is received by draggable engine', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable,{
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const mouseDownSpy = vi.spyOn(draggableEngine, 'onMouseDown');
+    const mouseMoveSpy = vi.spyOn(draggableEngine, 'onMouseMove');
+
+    await draggable.find('.draggable-content').trigger('mousedown');
+
+    global.window.dispatchEvent(new MouseEvent('mousemove'));
+
+    expect(mouseDownSpy).toHaveBeenCalled();
+    expect(mouseMoveSpy).toHaveBeenCalled();
   });
 });
