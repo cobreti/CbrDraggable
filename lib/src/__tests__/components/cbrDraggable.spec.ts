@@ -31,6 +31,10 @@ describe('CbrDraggable component', async () => {
     onMouseDown: (event: MouseEvent): boolean => { return true; },
     onMouseMove: (event: MouseEvent): void => {},
     onMouseUp: (event: MouseEvent): void => {},
+    onTouchStart: (event: TouchEvent): boolean => { return true;},
+    onTouchMove: (event: TouchEvent): void => {},
+    onTouchEnd: (event: TouchEvent): void => {},
+    onTouchCancel: (event: TouchEvent): void => {}
   };
 
   //
@@ -272,6 +276,136 @@ describe('CbrDraggable component', async () => {
     expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
     expect(removeEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
     expect(removeEventListenerSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+
+    draggable.unmount();
+  });
+
+  test('touch start registers touch event listeners', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const touchStartSpy = vi.spyOn(draggableEngine, 'onTouchStart');
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+    await draggable.find('.draggable-content').trigger('touchstart');
+
+    expect(touchStartSpy).toHaveBeenCalled();
+    expect(addEventListenerSpy).toHaveBeenCalledTimes(3);
+    expect(addEventListenerSpy).toHaveBeenCalledWith('touchmove', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
+    expect(addEventListenerSpy).toHaveBeenCalledWith('touchcancel', expect.any(Function));
+
+    draggable.unmount();
+  });
+
+  test('touch start returns false : no listener registered', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const touchStartSpy = vi.spyOn(draggableEngine, 'onTouchStart')
+        .mockReturnValue(false);
+    const addEventListenerSpy = vi.spyOn(window, 'addEventListener');
+
+    await draggable.find('.draggable-content').trigger('touchstart');
+
+    expect(touchStartSpy).toHaveBeenCalled();
+    expect(addEventListenerSpy).not.toHaveBeenCalled();
+
+    draggable.unmount();
+  });
+
+  test('touch move sent to window is received by draggable engine', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const touchStartSpy = vi.spyOn(draggableEngine, 'onTouchStart');
+    const touchMoveSpy = vi.spyOn(draggableEngine, 'onTouchMove');
+
+    await draggable.find('.draggable-content').trigger('touchstart');
+
+    global.window.dispatchEvent(new TouchEvent('touchmove'));
+
+    expect(touchStartSpy).toHaveBeenCalled();
+    expect(touchMoveSpy).toHaveBeenCalled();
+
+    draggable.unmount();
+  });
+
+  test('touch end sent to window removes touch event listeners', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const touchStartSpy = vi.spyOn(draggableEngine, 'onTouchStart');
+    const touchEndSpy = vi.spyOn(draggableEngine, 'onTouchEnd');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    await draggable.find('.draggable-content').trigger('touchstart');
+
+    global.window.dispatchEvent(new TouchEvent('touchend'));
+
+    expect(touchStartSpy).toHaveBeenCalled();
+    expect(touchEndSpy).toHaveBeenCalled();
+    expect(removeEventListenerSpy).toHaveBeenCalledTimes(3);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchmove', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchcancel', expect.any(Function));
+
+    draggable.unmount();
+  });
+
+  test('touch cancel sent to window removes touch event listeners', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const touchStartSpy = vi.spyOn(draggableEngine, 'onTouchStart');
+    const touchCancelSpy = vi.spyOn(draggableEngine, 'onTouchCancel');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    await draggable.find('.draggable-content').trigger('touchstart');
+
+    global.window.dispatchEvent(new TouchEvent('touchcancel'));
+
+    expect(touchStartSpy).toHaveBeenCalled();
+    expect(touchCancelSpy).toHaveBeenCalled();
+    expect(removeEventListenerSpy).toHaveBeenCalledTimes(3);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchmove', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchcancel', expect.any(Function));
 
     draggable.unmount();
   });
