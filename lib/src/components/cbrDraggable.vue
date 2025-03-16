@@ -33,7 +33,7 @@
 
 <script setup lang="ts">
 
-  import {onMounted, provide, useTemplateRef} from 'vue'
+import {onMounted, onUnmounted, provide, useTemplateRef} from 'vue'
   import {
     CbrDraggableProps,
   } from '../cbrDragNDropTypes.js'
@@ -64,6 +64,14 @@
       window.addEventListener('mouseup', onMouseUp)
     }
   }
+
+  onUnmounted(() => {
+    window.removeEventListener('mousemove', onMouseMove)
+    window.removeEventListener('mouseup', onMouseUp)
+    window.removeEventListener('touchmove', onTouchMove);
+    window.removeEventListener('touchend', onTouchEnd);
+    window.removeEventListener('touchcancel', onTouchCancel);
+  });
 
   function onMouseMove(event: MouseEvent) {
     draggableCore.onMouseMove(event);

@@ -30,6 +30,7 @@ describe('CbrDraggable component', async () => {
     getExternalState: (externalState: string) => {},
     onMouseDown: (event: MouseEvent): boolean => { return true; },
     onMouseMove: (event: MouseEvent): void => {},
+    onMouseUp: (event: MouseEvent): void => {},
   };
 
   //
@@ -128,6 +129,8 @@ describe('CbrDraggable component', async () => {
       }
     });
 
+    draggable.unmount();
+
     expect(provideSpy).toHaveBeenCalled();
   });
 
@@ -135,7 +138,8 @@ describe('CbrDraggable component', async () => {
 
     const hoistedFct = setup();
 
-    const addEventListenerSpy = vi.spyOn(draggableEngine, 'addEventListener');
+    const addEventListenerSpy = vi.spyOn(draggableEngine, 'addEventListener')
+        .mockImplementation(() => {});
     const createDraggableEngineSpy = vi.spyOn(hoistedFct, 'createDraggableEngine');
 
     const draggable = mount(CbrDraggable,{
@@ -148,6 +152,31 @@ describe('CbrDraggable component', async () => {
 
     expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
     expect(createDraggableEngineSpy).toHaveBeenCalled();
+
+    draggable.unmount();
+  });
+
+  test('unmount removes event listeners', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    draggable.unmount();
+
+    expect(removeEventListenerSpy).toHaveBeenCalledTimes(5);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchmove', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchend', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('touchcancel', expect.any(Function));
   });
 
   test('mouse down returns true : listener registered', async () => {
@@ -170,6 +199,8 @@ describe('CbrDraggable component', async () => {
     expect(addEventListenerSpy).toHaveBeenCalledTimes(2);
     expect(addEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
     expect(addEventListenerSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+
+    draggable.unmount();
   });
 
   test('mouse down returns false : no listener registered', async () => {
@@ -189,6 +220,8 @@ describe('CbrDraggable component', async () => {
     await draggable.find('.draggable-content').trigger('mousedown');
 
     expect(mouseDownSpy).toHaveBeenCalled();
+
+    draggable.unmount();
   });
 
   test('mouse move sent to window is received by draggable engine', async () => {
@@ -211,5 +244,35 @@ describe('CbrDraggable component', async () => {
 
     expect(mouseDownSpy).toHaveBeenCalled();
     expect(mouseMoveSpy).toHaveBeenCalled();
+
+    draggable.unmount();
+  });
+
+  test('mouse up sent to window remove event listeners', async () => {
+    const hoistedFct = setup();
+
+    const draggable = mount(CbrDraggable, {
+      template: `<div>test</div>`,
+      props: {
+        id: 'test',
+        controller: draggableController
+      }
+    });
+
+    const mouseDownSpy = vi.spyOn(draggableEngine, 'onMouseDown');
+    const mouseUpSpy = vi.spyOn(draggableEngine, 'onMouseUp');
+    const removeEventListenerSpy = vi.spyOn(window, 'removeEventListener');
+
+    await draggable.find('.draggable-content').trigger('mousedown');
+
+    global.window.dispatchEvent(new MouseEvent('mouseup'));
+
+    expect(mouseDownSpy).toHaveBeenCalled();
+    expect(mouseUpSpy).toHaveBeenCalled();
+    expect(removeEventListenerSpy).toHaveBeenCalledTimes(2);
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('mousemove', expect.any(Function));
+    expect(removeEventListenerSpy).toHaveBeenCalledWith('mouseup', expect.any(Function));
+
+    draggable.unmount();
   });
 });

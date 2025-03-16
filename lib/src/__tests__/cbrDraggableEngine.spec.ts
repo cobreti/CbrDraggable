@@ -1496,5 +1496,4 @@ describe('cbrDraggableEngine', () => {
       expect(mockOptions.hooks.onMounted).toHaveBeenCalled();
     });
   });
-
 });
