@@ -108,11 +108,6 @@ describe('CbrDraggable component', async () => {
   }
 
   beforeEach(() => {
-    config.global.mocks = {
-      provide: (key: any, value: any) => {
-        console.log('test');
-      }
-    };
   });
 
   afterEach(() => {
