@@ -1,10 +1,11 @@
 import { describe, test, expect, vi, afterEach } from 'vitest';
 import {CbrDraggableInterface} from '@/cbrDraggableInterface.js';
-import {inject} from 'vue';
 import CbrDraggableOnAdd from '@/components/cbrDraggableOnAdd.vue';
-import {mount} from '@vue/test-utils';
+import {DOMWrapper, flushPromises, mount} from '@vue/test-utils';
+import {CbrDraggableEventsListener} from '@/eventsListeners/cbrDraggableEventsListener.js';
+import {draggableESShowAdd, draggableESShowRemove} from '@/keys.js';
 
-describe('CbrDraggableOnAdd()', () => {
+describe('CbrDraggableOnAdd()', async () => {
 
   const mockDraggable: CbrDraggableInterface = {
     id: 'test',
@@ -50,6 +51,19 @@ describe('CbrDraggableOnAdd()', () => {
     vi.resetAllMocks();
   });
 
+  test('object visible by default', () => {
+    const hoistedFct = setup();
+
+    const component = mount(CbrDraggableOnAdd, {
+      template: '<div>test</div>',
+      props: {}
+    });
+
+    expect(component.find('div').isVisible()).toBe(false);
+
+    component.unmount();
+  });
+
   test('object added as event listener', () => {
 
     const hoistedFct = setup();
@@ -66,6 +80,117 @@ describe('CbrDraggableOnAdd()', () => {
     expect(addEventListenerSpy).toHaveBeenCalled();
 
     component.unmount();
+  });
+
+  test('click emitted', () => {
+
+    const hoistedFct = setup();
+
+    const component = mount(CbrDraggableOnAdd, {
+      template: '<div>test</div>',
+      props: {  }
+    });
+
+    component.find('div').trigger('click');
+
+    expect(component.emitted().click[0]).toEqual([mockDraggable]);
+
+    component.unmount();
+  });
+
+  test('component visible if ESShowAdd is true', async () => {
+    const hoistedFct = setup();
+
+    let listener : CbrDraggableEventsListener | undefined;
+
+    const addEventListenerSpy = vi.spyOn(mockDraggable, 'addEventListener')
+        .mockImplementation((l) => {
+          listener = l;
+        });
+
+    const component = mount(CbrDraggableOnAdd, {
+      template: '<div class="test">test</div>',
+      props: {
+      }
+    });
+
+    expect(listener).not.toBeUndefined();
+
+    listener.onExternalStateChanged(mockDraggable, draggableESShowAdd, true, true);
+
+    await component.vm.$nextTick();
+
+    expect(component.vm.$el.style.display).not.toBe('none');
+
+    component.unmount();
+  });
+
+  test('component visibility toggle true/false on successive ESShowAdd events', async () => {
+    const hoistedFct = setup();
+
+    let listener : CbrDraggableEventsListener | undefined;
+
+    const addEventListenerSpy = vi.spyOn(mockDraggable, 'addEventListener')
+        .mockImplementation((l) => {
+          listener = l;
+        });
+
+    const component = mount(CbrDraggableOnAdd, {
+      template: '<div class="test">test</div>',
+      props: {
+      }
+    });
+
+    expect(listener).not.toBeUndefined();
+
+    listener.onExternalStateChanged(mockDraggable, draggableESShowAdd, true, true);
+
+    await component.vm.$nextTick();
+
+    //
+    //  using
+    //    component.find('div').isVisible()
+    //  seems to prevent consecutive DOM updates
+    //  checking display style directly on $el instead
+    //
+
+    // expect(component.find('div').isVisible()).toBe(true);
+    expect(component.vm.$el.style.display).not.toBe('none');
+
+    listener.onExternalStateChanged(mockDraggable, draggableESShowAdd, true, false);
+
+    await component.vm.$nextTick();
+
+    // expect(component.find('div').isVisible()).toBe(false);
+    expect(component.vm.$el.style.display).toBe('none');
+
+    component.unmount();
+  });
+
+  test('other events than ESShowAdd should not affect visibility', async () => {
+    const hoistedFct = setup();
+
+    let listener : CbrDraggableEventsListener | undefined;
+
+    const addEventListenerSpy = vi.spyOn(mockDraggable, 'addEventListener')
+        .mockImplementation((l) => {
+          listener = l;
+        });
+
+    const component = mount(CbrDraggableOnAdd, {
+      template: '<div class="test">test</div>',
+      props: {
+      }
+    });
+
+    expect(listener).not.toBeUndefined();
+    expect(component.vm.$el.style.display).toBe('none');
+
+    listener.onExternalStateChanged(mockDraggable, draggableESShowRemove, true, true);
+
+    await component.vm.$nextTick();
+
+    expect(component.vm.$el.style.display).toBe('none');
   });
 
 });
