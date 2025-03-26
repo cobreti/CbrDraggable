@@ -1,5 +1,5 @@
 # Sample workflow for building and deploying a Hugo site to GitHub Pages
-name: Build CbrDraggable package
+name: Build & Publish CbrDraggable package to npmjs
 
 on:
   # Runs on pushes targeting the default branch
@@ -18,7 +18,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '23.x'
-          registry-url: 'https://npm.pkg.github.com'
+          registry-url: 'https://registry.npmjs.org'
           scope: '@cobreti'
       - run: npm ci
         working-directory: lib
@@ -26,3 +26,7 @@ jobs:
         working-directory: lib
       - run: npm run coverage
         working-directory: lib
+      - run: npm publish --provenance --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
