@@ -27,6 +27,7 @@ jobs:
       - run: npm run coverage
         working-directory: lib
       - run: npm publish --provenance --access public
+        working-directory: lib
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
 
