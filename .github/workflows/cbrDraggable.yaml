@@ -11,6 +11,13 @@ on:
       - main
 
 jobs:
+  checkout:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - uses: actions/checkout@v4
   build:
     runs-on: ubuntu-latest
     permissions:
@@ -18,7 +25,7 @@ jobs:
       packages: write
       id-token: write
     steps:
-      - uses: actions/checkout@v4
+#      - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
         with:
           node-version: '23.x'
@@ -28,8 +35,14 @@ jobs:
         working-directory: lib
       - run: npm run build --if-present
         working-directory: lib
+  test:
+    runs-on: ubuntu-latest
+    steps:
       - run: npm run coverage
         working-directory: lib
+  publish:
+    runs-on: ubuntu-latest
+    steps:
       - run: npm publish --provenance --access public
         working-directory: lib
         env:
