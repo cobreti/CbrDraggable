@@ -19,6 +19,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
   build:
+    needs: checkout
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -36,11 +37,13 @@ jobs:
       - run: npm run build --if-present
         working-directory: lib
   test:
+    needs: build
     runs-on: ubuntu-latest
     steps:
       - run: npm run coverage
         working-directory: lib
   publish:
+    needs: test
     runs-on: ubuntu-latest
     steps:
       - run: npm publish --provenance --access public
