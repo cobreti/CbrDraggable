@@ -1,0 +1,11 @@
+name: 'build testapp'
+description: 'build testapp'
+runs:
+  using: "composite"
+  steps:
+    - run: npm ci
+      shell: bash
+      working-directory: app/TestApplication
+    - run: npm run build --if-present
+      shell: bash
+      working-directory: app/TestApplication
