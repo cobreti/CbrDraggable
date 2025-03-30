@@ -1,18 +1,13 @@
 name: 'build lib'
 description: 'build library'
-inputs:
-  working-directory:
-    description: 'library folder'
-    required: true
-    default: lib
 runs:
   using: "composite"
   steps:
     - run: npm ci
-      working-directory: ${{inputs.working-directory}}
+      working-directory: lib
     - run: npm run build --if-present
-      working-directory: ${{inputs.working-directory}}
+      working-directory: lib
 
     - name: Test
       run: npm run coverage
-      working-directory: ${{inputs.working-directory}}
+      working-directory: lib

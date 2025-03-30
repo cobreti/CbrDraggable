@@ -27,8 +27,6 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
           scope: '@cobreti'
       - uses: ./.github/actions/build-lib
-        with:
-          working-directory: lib
 #      - run: npm ci
 #        working-directory: lib
 #      - run: npm run build --if-present
