@@ -4,10 +4,12 @@ runs:
   using: "composite"
   steps:
     - run: npm ci
+      shell: bash
       working-directory: lib
     - run: npm run build --if-present
+      shell: bash
       working-directory: lib
-
     - name: Test
       run: npm run coverage
+      shell: bash
       working-directory: lib
