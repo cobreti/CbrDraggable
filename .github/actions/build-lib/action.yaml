@@ -5,7 +5,6 @@ inputs:
     description: 'library folder'
     required: true
     default: lib
-outputs:
 runs:
   using: "composite"
   steps:
