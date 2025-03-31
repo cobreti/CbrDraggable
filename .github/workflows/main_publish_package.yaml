@@ -27,7 +27,7 @@ jobs:
 
       - name: publish
         run: |
-          cp ./readme.md ./lib/dist/readme.md
+          cp ./readme.md ./lib/readme.md
 
       - run: npm publish --provenance --access public
         working-directory: lib
