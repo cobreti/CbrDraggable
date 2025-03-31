@@ -26,9 +26,10 @@ jobs:
         uses: ./.github/actions/build-lib
 
       - name: publish
-        script:
+        run: |
           cp ./readme.md ./lib/dist/readme.md
-        run: npm publish --provenance --access public
+
+      - run: npm publish --provenance --access public
         working-directory: lib
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
