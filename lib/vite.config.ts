@@ -12,7 +12,7 @@ export default defineConfig({
         sassDts(),
         vueJsx(),
         tsconfigPaths(),
-        dts()
+        dts({ rollupTypes: true })
     ],
     resolve: {
         alias: {
