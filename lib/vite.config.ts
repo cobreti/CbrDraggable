@@ -29,6 +29,7 @@ export default defineConfig({
         }
     },
     build: {
+        sourcemap: true,
         target: "esnext",
         emptyOutDir: true,
         lib: {
