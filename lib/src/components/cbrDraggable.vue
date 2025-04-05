@@ -10,7 +10,7 @@
   */
 
 <template>
-  <div class="cbr-draggable-item-root" ref="draggableContent">
+  <div :class="CbrDraggableClassName" ref="draggableContent">
     <div class="draggable-content" @mousedown="onMouseDown" @touchstart="onTouchStart">
       <slot></slot>
     </div>
@@ -33,9 +33,10 @@
 
 <script setup lang="ts">
 
-import {onMounted, onUnmounted, provide, useTemplateRef} from 'vue'
+  import {onMounted, onUnmounted, provide, useTemplateRef} from 'vue'
   import {
     CbrDraggableProps,
+    CbrDraggableClassName
   } from '../cbrDragNDropTypes.js'
   import {CbrDraggableElementFactory, createDraggableEngine} from '@/cbrDraggableEngine.js';
   import {draggableInjectionKey} from '@/keys.js';

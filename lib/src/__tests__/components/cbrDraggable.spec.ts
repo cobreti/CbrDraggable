@@ -3,7 +3,7 @@ import {describe, test, expect, vi, beforeEach, afterEach} from 'vitest';
 import  CbrDraggable from '../../components/cbrDraggable.vue';
 import {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {CbrDraggableEngine, DraggableEngineOptions} from '@/cbrDraggableEngine.js';
-import {CbrDraggableProps} from '@/cbrDragNDropTypes.js';
+import {CbrDraggableClassName, CbrDraggableProps} from '@/cbrDragNDropTypes.js';
 import {CbrDraggableControllerInterface} from '@/cbrDraggableController.js';
 import {Observable, of} from 'rxjs';
 
@@ -43,7 +43,7 @@ describe('CbrDraggable component', async () => {
   const draggableController: CbrDraggableControllerInterface = {
     pinAreaElement: global.document.createElement('div'),
     freeAreaElement: global.document.createElement('div'),
-    draggableSelector: '.cbr-draggable-item-root',
+    draggableSelector: `.${CbrDraggableClassName}`,
     freeAreaSelector: '.free-area',
 
     getDropAreaFromPoint: (x: number, y: number): HTMLElement | undefined => {

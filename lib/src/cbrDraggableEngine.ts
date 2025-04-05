@@ -1,6 +1,7 @@
 import {onMounted, ref, Ref, useTemplateRef} from 'vue';
 import type {CbrDraggableEventsListenerInterface, CbrDraggableInterface} from '@/cbrDraggableInterface.js';
 import {
+    CbrDraggableClassName,
     CbrDraggableProps,
     CbrDraggableState,
     CbrDraggableStateEnum, CbrDraggableVuejsHooks, CbrHoverEnterEvent, CbrHoverExitEvent,
@@ -402,7 +403,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return false;
         }
 
-        const draggableSelector = this.props.controller?.draggableSelector || '.cbr-draggable-item-root';
+        const draggableSelector = this.props.controller?.draggableSelector || `.${CbrDraggableClassName}`;
         const draggableElm = elm.closest(draggableSelector);
         if (!draggableElm) {
             return false;
@@ -436,7 +437,7 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return false;
         }
 
-        const draggableSelector = this.props.controller?.draggableSelector || '.cbr-draggable-item-root';
+        const draggableSelector = this.props.controller?.draggableSelector || `.${CbrDraggableClassName}`;
         const draggableElm = elm.closest(draggableSelector);
         if (!draggableElm) {
             return false;

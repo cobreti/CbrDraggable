@@ -3,6 +3,7 @@
 
 import { afterEach, beforeEach, describe, expect, test, vi } from 'vitest';
 import {
+  CbrDraggableClassName,
   CbrDraggableProps,
   CbrDraggableState,
   CbrDraggableStateEnum,
@@ -1214,7 +1215,7 @@ describe('cbrDraggableEngine', () => {
       const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(true);
 
       const elm = jsdom.window.document.createElement('div');
-      elm.classList.add('draggable-item');
+      elm.classList.add(CbrDraggableClassName);
 
       const onDragStartSpy = vi.spyOn(draggableEngine, 'onDragStart').mockImplementation(() => {
       });
@@ -1300,7 +1301,7 @@ describe('cbrDraggableEngine', () => {
       const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(false);
 
       const elm = jsdom.window.document.createElement('div');
-      elm.classList.add('draggable-item');
+      elm.classList.add(CbrDraggableClassName);
 
       const mockTouchEvent: TouchEvent = createTouchEvent(100, 150, {
         target: elm
@@ -1325,7 +1326,7 @@ describe('cbrDraggableEngine', () => {
       const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
 
       const elm = jsdom.window.document.createElement('div');
-      elm.classList.add('draggable-item');
+      elm.classList.add(CbrDraggableClassName);
       vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(elm);
 
       const result = draggableEngine.onMouseDown(mockMouseEvent);
@@ -1380,7 +1381,7 @@ describe('cbrDraggableEngine', () => {
       const canPickSpy = vi.spyOn(props.controller, 'canPick').mockReturnValue(false);
 
       const elm = jsdom.window.document.createElement('div');
-      elm.classList.add('draggable-item');
+      elm.classList.add(CbrDraggableClassName);
 
       const mockMouseEvent = createMouseEvent('mousedown', 100, 150);
       vi.spyOn(mockMouseEvent, 'target', 'get').mockReturnValue(elm);

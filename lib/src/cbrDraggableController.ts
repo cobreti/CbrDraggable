@@ -1,5 +1,6 @@
 import { BehaviorSubject, Observable } from "rxjs";
 import type { CbrDraggableInterface } from "./cbrDraggableInterface.ts";
+import { CbrDraggableClassName } from "./cbrDragNDropTypes.ts";
 
 
 export interface CbrDraggableControllerInterface {
@@ -49,7 +50,7 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
     constructor(options: CbrDraggableControllerOptions) {
         this.pinAreaSelector_ = options.pinAreaSelector;
         this.freeAreaSelector_ = options.freeAreaSelector;
-        this.draggableSelector_ = options.draggableSelector || '.cbr-draggable-item-root';
+        this.draggableSelector_ = options.draggableSelector || `.${CbrDraggableClassName}`;
     }
 
     get pinAreaElement(): HTMLElement {

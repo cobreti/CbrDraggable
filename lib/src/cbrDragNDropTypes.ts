@@ -45,3 +45,5 @@ export type CbrDraggableProps = {
 export type CbrDraggableVuejsHooks = {
   onMounted: (callback: () => void) => void,
 }
+
+export const CbrDraggableClassName = 'cbr-draggable-item-root';
