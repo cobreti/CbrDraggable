@@ -10,7 +10,7 @@
   */
 
 <template>
-  <div class="draggable" ref="draggableContent">
+  <div class="cbr-draggable-item-root" ref="draggableContent">
     <div class="draggable-content" @mousedown="onMouseDown" @touchstart="onTouchStart">
       <slot></slot>
     </div>
@@ -22,7 +22,7 @@
 
 <style scoped>
 
-  .draggable {
+  .cbr-draggable-item-root {
     display:  inline-block;
 
   }

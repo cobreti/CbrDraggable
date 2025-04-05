@@ -43,6 +43,7 @@ describe('CbrDraggable component', async () => {
   const draggableController: CbrDraggableControllerInterface = {
     pinAreaElement: global.document.createElement('div'),
     freeAreaElement: global.document.createElement('div'),
+    draggableSelector: '.cbr-draggable-item-root',
     freeAreaSelector: '.free-area',
 
     getDropAreaFromPoint: (x: number, y: number): HTMLElement | undefined => {

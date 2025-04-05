@@ -7,6 +7,7 @@ export interface CbrDraggableControllerInterface {
     pinAreaElement: HTMLElement;
     freeAreaElement: HTMLElement | null;
     freeAreaSelector: string;
+    draggableSelector: string;
 
     getDropAreaFromPoint(x: number, y: number): HTMLElement | undefined;
 
@@ -31,6 +32,7 @@ export interface CbrDraggableControllerInterface {
 export type CbrDraggableControllerOptions = {
     pinAreaSelector: string;
     freeAreaSelector: string;
+    draggableSelector?: string;
 }
 
 export class DraggableBehaviorSubject extends BehaviorSubject<CbrDraggableInterface | undefined> {}
@@ -41,11 +43,13 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
 
     pinAreaSelector_: string;
     freeAreaSelector_: string;
+    draggableSelector_: string;
     draggables_: DraggablesTable = {};
 
     constructor(options: CbrDraggableControllerOptions) {
         this.pinAreaSelector_ = options.pinAreaSelector;
         this.freeAreaSelector_ = options.freeAreaSelector;
+        this.draggableSelector_ = options.draggableSelector || '.cbr-draggable-item-root';
     }
 
     get pinAreaElement(): HTMLElement {
@@ -58,6 +62,10 @@ export class CbrDraggableController implements CbrDraggableControllerInterface {
 
     get freeAreaSelector(): string {
         return this.freeAreaSelector_;
+    }
+
+    get draggableSelector(): string {
+        return this.draggableSelector_;
     }
 
     get freeAreaElement(): HTMLElement | null {

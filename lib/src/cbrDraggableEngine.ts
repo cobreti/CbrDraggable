@@ -402,7 +402,8 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return false;
         }
 
-        const draggableElm = elm.closest('.draggable-item');
+        const draggableSelector = this.props.controller?.draggableSelector || '.cbr-draggable-item-root';
+        const draggableElm = elm.closest(draggableSelector);
         if (!draggableElm) {
             return false;
         }
@@ -435,7 +436,8 @@ export class CbrDraggableEngine implements CbrDraggableInterface {
             return false;
         }
 
-        const draggableElm = elm.closest('.draggable-item');
+        const draggableSelector = this.props.controller?.draggableSelector || '.cbr-draggable-item-root';
+        const draggableElm = elm.closest(draggableSelector);
         if (!draggableElm) {
             return false;
         }
